@@ -28,8 +28,7 @@ public class Category {
     @JoinColumn(name = "parent_id")
     private Category parentCategory;
 
-    public Category() {
-    }
+
 
     // Getters and Setters
 
