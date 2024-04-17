@@ -50,7 +50,8 @@ public class Product {
 
     @Column(nullable = false)
     private int stockQuantity;
-
+    @Column(nullable = false)
+    private String brand;
 
 
     @ElementCollection(fetch = FetchType.LAZY)

@@ -13,10 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDto {
-    private Long productId;
+    private Long id;
     private String name;
     private String description;
     private Double price;
+    private String brand;
     private Long categoryId; // Assuming each product is associated with a category
     private int stockQuantity;  // Add the stockQuantity field
     private Set<Size> availableSizes;

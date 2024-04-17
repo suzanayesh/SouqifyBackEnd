@@ -45,7 +45,8 @@ public class ProductService {
         product.setStockQuantity(productDto.getStockQuantity());
         product.setAvailableSizes(productDto.getAvailableSizes()); // New line to set sizes
         product.setAvailableColors(productDto.getAvailableColors()); // New line to set colors
-        product.setUser(user); // Set the user
+        product.setUser(user);
+        product.setBrand(productDto.getBrand());// Set the user
         product.setCategory(category); // Set the category
 
         // Save the Product entity to the database
@@ -55,7 +56,9 @@ public class ProductService {
     public List<Product> findAllProductsByUser(Long userId) {
         return productRepository.findAllByUserId(userId);
     }
-
+//    public List<Product> findProductsByName(String productName) {
+//        return productRepository.findByName(productName);
+//    }
     public Optional<Product> findProductByIdAndUser(Long userId, Long productId) {
         // Implement fetching by user and product ID
         return productRepository.findByIdAndUserId(productId, userId);
@@ -73,7 +76,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product updateProduct(Long userId, Long productId, Product productDetails) {
+    public Product addProduct(Long userId, Long productId, Product productDetails) {
         Product product = findProductByIdAndUser(userId, productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + productId + " for user " + userId));
 
@@ -82,6 +85,7 @@ public class ProductService {
         product.setDescription(productDetails.getDescription());
         product.setPrice(productDetails.getPrice());
         product.setStockQuantity(productDetails.getStockQuantity());
+product.setBrand(productDetails.getBrand());
 
         // Assume category is handled similarly to saveProduct
         return productRepository.save(product);
