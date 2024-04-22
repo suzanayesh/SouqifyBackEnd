@@ -2,6 +2,8 @@ package com.code.auth.controller;
 
 import com.code.auth.dto.AuthRequest;
 import com.code.auth.dto.user.UserDto;
+import com.code.auth.entity.Cart;
+import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.lookup.ApiResponse;
 import com.code.auth.lookup.Response;
@@ -26,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,6 +60,21 @@ public class UserController {
   public String addNewUser(@RequestBody UserDto userDto) {
     return service.addUser(userDto);
   }
+//@PostMapping("/signup")
+//public ResponseEntity<?> signupUser(@RequestBody UserDto newUser) {
+//  Role userRole = roleService.getRoleById(newUser.getRoleId());
+//  newUser.setRole(userRole);
+//  UserInfo savedUser = service.addUser(newUser);
+//
+//  if ("retailer".equalsIgnoreCase(userRole.getName())) {
+//    Cart newCart = new Cart();
+//    newCart.setUser(savedUser);
+//    newCart.setItems(new ArrayList<>());
+//    cartService.saveCart(newCart);
+//  }
+//
+//  return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+//}
 
 
   @GetMapping("/user/RetailerProfile")

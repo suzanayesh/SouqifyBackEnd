@@ -48,6 +48,8 @@ public class SecurityConfig {
       .and()
       .authorizeHttpRequests().requestMatchers("/users/{userId}/products/**").authenticated()
       .and()
+      .authorizeHttpRequests().requestMatchers("/retailer/carts/**").authenticated()
+      .and()
       .sessionManagement()
       .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       .and()

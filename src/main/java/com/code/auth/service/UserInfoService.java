@@ -1,6 +1,7 @@
 package com.code.auth.service;
 
 import com.code.auth.dto.user.UserDto;
+import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.exception.EmailExistsException;
@@ -45,6 +46,10 @@ public class UserInfoService implements UserDetailsService {
     }
 
 
+    public Optional<UserInfo> getUserById(Long id) {
+        return userInfoRepository.findById(id);
+    }
+
     //  @Transactional
 //  public String addUser(UserDto userDto) {
 //    // Check if a user with the given email already exists
@@ -65,34 +70,71 @@ public class UserInfoService implements UserDetailsService {
 //      // Handle case when role with specified ID is not found
 //      throw new IllegalArgumentException("Role with ID " + userDto.getRoleId() + " not found");
 //    }
-public String addUser(UserDto userDto) {
+//public String addUser(UserDto userDto) {
+//        log.info("Checking if user email already exists");
+//        if (userInfoRepository.findByEmail(userDto.getEmail()).isPresent()) {
+//            log.error("Email already exists: {}", userDto.getEmail());
+//            throw new EmailExistsException(userDto.getEmail());
+//        }
+//
+//        log.info("Checking if username already exists");
+//        if (userInfoRepository.findByName(userDto.getName()).isPresent()) {
+//            log.error("Username already exists: {}", userDto.getName());
+//            throw new UsernameExistsException(userDto.getName());
+//        }
+//
+//        UserInfo userInfo = mapper.map(userDto, UserInfo.class);
+//        log.info("Looking up role by ID: {}", userDto.getRoleId());
+//        Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+//
+//        if (roleOptional.isPresent()) {
+//            Role role = roleOptional.get();
+//            userInfo.setPassword(encoder.encode(userDto.getPassword()));
+//            userInfo.setRole(role);
+//            userInfoRepository.save(userInfo);
+//            log.info("User added successfully");
+//            return "User Added Successfully";
+//        } else {
+//            log.error("Role with ID not found: {}", userDto.getRoleId());
+//            throw new IllegalArgumentException("Role with ID " + userDto.getRoleId() + " not found");
+//        }
+//    }
+    @Autowired
+    private CartService cartService;
+    @Transactional
+    public String addUser(UserDto userDto) {
         log.info("Checking if user email already exists");
         if (userInfoRepository.findByEmail(userDto.getEmail()).isPresent()) {
             log.error("Email already exists: {}", userDto.getEmail());
             throw new EmailExistsException(userDto.getEmail());
         }
-
         log.info("Checking if username already exists");
         if (userInfoRepository.findByName(userDto.getName()).isPresent()) {
             log.error("Username already exists: {}", userDto.getName());
             throw new UsernameExistsException(userDto.getName());
         }
+        Role role = roleRepository.findById(userDto.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found with id: " + userDto.getRoleId()));
 
-        UserInfo userInfo = mapper.map(userDto, UserInfo.class);
-        log.info("Looking up role by ID: {}", userDto.getRoleId());
-        Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+        UserInfo user = new UserInfo();
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(encoder.encode(userDto.getPassword()));
+        user.setRole(role);
+        user.setStorename(userDto.getStorename());
 
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
-            userInfo.setPassword(encoder.encode(userDto.getPassword()));
-            userInfo.setRole(role);
-            userInfoRepository.save(userInfo);
-            log.info("User added successfully");
-            return "User Added Successfully";
-        } else {
-            log.error("Role with ID not found: {}", userDto.getRoleId());
-            throw new IllegalArgumentException("Role with ID " + userDto.getRoleId() + " not found");
+        // Save the UserInfo object and assign the result to savedUser
+        UserInfo savedUser = userInfoRepository.save(user);
+        log.info("User saved successfully with ID: {}", savedUser.getId());
+
+        if ("retailer".equalsIgnoreCase(role.getName())) {
+            Cart newCart = new Cart();
+            newCart.setUser(savedUser);
+            cartService.saveCart(newCart);
+            log.info("Cart created for retailer with ID: {}", savedUser.getId());
         }
+
+        return "User created successfully with ID: " + savedUser.getId();
     }
 
     @Transactional
@@ -135,4 +177,6 @@ public String addUser(UserDto userDto) {
     public Optional<Role> getRoleByName(String roleName) {
         return roleRepository.findByName(roleName);
     }
+
+
 }
