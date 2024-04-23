@@ -5,6 +5,7 @@ import java.util.List;
 import com.code.auth.dto.user.CartItemDTO;
 import com.code.auth.entity.CartItem;
 import com.code.auth.service.CartItemService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,10 +54,18 @@ public class CartItemController {
         CartItem updatedCartItem = cartItemService.updateCartItem(id, cartItemDetails);
         return ResponseEntity.ok(updatedCartItem);
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCartItem(@PathVariable Long id) {
-        cartItemService.deleteCartItem(id);
-        return ResponseEntity.ok().build();
+        try {
+            cartItemService.deleteCartItem(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart item not found with id: " + id);
+        }
     }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteCartItem(@PathVariable Long id) {
+//        cartItemService.deleteCartItem(id);
+//        return ResponseEntity.ok().build();
+//    }
 }
