@@ -49,11 +49,16 @@ public class CartItemController {
         return cartItemService.saveCartItem(cartItem);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CartItem> updateCartItem(@PathVariable Long id, @RequestBody CartItem cartItemDetails) {
-        CartItem updatedCartItem = cartItemService.updateCartItem(id, cartItemDetails);
-        return ResponseEntity.ok(updatedCartItem);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<CartItem> updateCartItem(@PathVariable Long id, @RequestBody CartItem cartItemDetails) {
+//        CartItem updatedCartItem = cartItemService.updateCartItem(id, cartItemDetails);
+//        return ResponseEntity.ok(updatedCartItem);
+//    }
+@PutMapping("/{id}")
+public ResponseEntity<CartItem> updateCartItem(@PathVariable Long id, @RequestBody CartItem updatedCartItem) {
+    CartItem cartItem = cartItemService.updateCartItem(id, updatedCartItem.getQuantity(), updatedCartItem.getPrice());
+    return ResponseEntity.ok(cartItem);
+}
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCartItem(@PathVariable Long id) {
         try {
