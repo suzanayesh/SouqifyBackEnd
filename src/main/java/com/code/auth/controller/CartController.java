@@ -3,6 +3,7 @@ package com.code.auth.controller;
 import java.util.List;
 
 import com.code.auth.entity.Cart;
+import com.code.auth.entity.CartItem;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.service.CartService;
 import com.code.auth.service.UserInfoService;
@@ -29,33 +30,37 @@ public class CartController {
         this.cartService = cartService;
         this.userService = userService;
     }
-
-
-    @PostMapping("/{userId}")
-    public ResponseEntity<?> createCart(@PathVariable Long userId, @RequestBody Cart cart) {
-        // Fetch the user using UserService
-        UserInfo user = userService.getUserById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        // Set the user to the cart
-        cart.setUser(user);
-
-        // Save the cart with the user associated
-        Cart savedCart = cartService.saveCart(cart);
-        return new ResponseEntity<>(savedCart, HttpStatus.CREATED);
+    @GetMapping("/{cartId}/items")
+    public ResponseEntity<List<CartItem>> getCartItems(@PathVariable Long cartId) {
+        List<CartItem> cartItems = cartService.findCartItemsByCartId(cartId);
+        return ResponseEntity.ok(cartItems);
     }
 
-    @GetMapping
-    public List<Cart> getAllCarts() {
-        return cartService.findAllCarts();
-    }
+//    @PostMapping("/{userId}")
+//    public ResponseEntity<?> createCart(@PathVariable Long userId, @RequestBody Cart cart) {
+//        // Fetch the user using UserService
+//        UserInfo user = userService.getUserById(userId)
+//                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+//
+//        // Set the user to the cart
+//        cart.setUser(user);
+//
+//        // Save the cart with the user associated
+//        Cart savedCart = cartService.saveCart(cart);
+//        return new ResponseEntity<>(savedCart, HttpStatus.CREATED);
+//    }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Cart> getCartById(@PathVariable Long id) {
-        return cartService.findCartById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+//    @GetMapping
+//    public List<Cart> getAllCarts() {
+//        return cartService.findAllCarts();
+//    }
+
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Cart> getCartById(@PathVariable Long id) {
+//        return cartService.findCartById(id)
+//                .map(ResponseEntity::ok)
+//                .orElseGet(() -> ResponseEntity.notFound().build());
+//    }
 
 
 

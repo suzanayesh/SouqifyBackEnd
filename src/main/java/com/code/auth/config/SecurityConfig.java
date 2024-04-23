@@ -38,24 +38,24 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.csrf()
-      .disable()
-      .authorizeHttpRequests()
-      .requestMatchers("/auth/welcome", "/auth/signup", "/auth/login", "/auth/search/{name}","users/search/**","/categories/getAll").permitAll()
-      .and()
-      .authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated()
-      .and()
-      .authorizeHttpRequests().requestMatchers("/auth/admin/**","/categories/**").authenticated()
-      .and()
-      .authorizeHttpRequests().requestMatchers("/users/{userId}/products/**").authenticated()
-      .and()
-      .authorizeHttpRequests().requestMatchers("/retailer/carts/**").authenticated()
-      .and()
-      .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
-      .authenticationProvider(authenticationProvider())
-      .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-      .build();
+            .disable()
+            .authorizeHttpRequests()
+            .requestMatchers("/auth/welcome", "/auth/signup", "/auth/login", "/auth/search/{name}","users/search/**","/categories/getAll").permitAll()
+            .and()
+            .authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated()
+            .and()
+            .authorizeHttpRequests().requestMatchers("/auth/admin/**","/categories/**").authenticated()
+            .and()
+            .authorizeHttpRequests().requestMatchers("/users/{userId}/products/**").authenticated()
+            .and()
+            .authorizeHttpRequests().requestMatchers("/retailer/carts/**","/cart/cartItems/**").authenticated()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
   }
 
   // Password Encoding

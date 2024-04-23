@@ -36,7 +36,11 @@ public class CartService {
         return cartRepository.findById(id);
     }
 
-
+    public List<CartItem> findCartItemsByCartId(Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
+        return cart.getCartItems();
+    }
     public Cart saveCart(Cart cart) {
         return cartRepository.save(cart);
     }

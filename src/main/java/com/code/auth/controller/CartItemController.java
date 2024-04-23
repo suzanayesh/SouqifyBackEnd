@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/cartItems")
+@RequestMapping("/cart/cartItems")
 public class CartItemController {
 
     private final CartItemService cartItemService;
@@ -60,4 +60,3 @@ public class CartItemController {
         return ResponseEntity.ok().build();
     }
 }
-
