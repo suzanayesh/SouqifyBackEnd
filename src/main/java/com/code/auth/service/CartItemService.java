@@ -40,19 +40,34 @@ public class CartItemService {
         return cartItemRepository.save(cartItem);
     }
 
-    @Transactional
-    public CartItem updateCartItem(Long id, CartItem cartItemDetails) {
-        CartItem cartItem = cartItemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CartItem not found with id " + id));
-        cartItem.setQuantity(cartItemDetails.getQuantity());
-        cartItem.setPrice(cartItemDetails.getPrice());
-        cartItem.setTotal(cartItemDetails.getPrice() * cartItemDetails.getQuantity()); // Calculate total based on the current price and quantity
-        return cartItemRepository.save(cartItem);
-    }
+//    @Transactional
+//    public CartItem updateCartItem(Long id, CartItem cartItemDetails) {
+//        CartItem cartItem = cartItemRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("CartItem not found with id " + id));
+//        cartItem.setQuantity(cartItemDetails.getQuantity());
+//        cartItem.setPrice(cartItemDetails.getPrice());
+//        cartItem.setTotal(cartItemDetails.getPrice() * cartItemDetails.getQuantity()); // Calculate total based on the current price and quantity
+//        return cartItemRepository.save(cartItem);
+//    }
+@Transactional
+public CartItem updateCartItem(Long id, int quantity, double price) {
+    CartItem cartItem = cartItemRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("CartItem not found with id: " + id));
 
+    cartItem.setQuantity(quantity);
+    cartItem.setPrice(price);
+    cartItem.setTotal(quantity * price);  // Assuming you want to update the total price as well
+
+    return cartItemRepository.save(cartItem);
+}
     public void deleteCartItem(Long id) {
-        cartItemRepository.deleteById(id);
+        CartItem cartItem = cartItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + id));
+        cartItemRepository.delete(cartItem);
     }
+//    public void deleteCartItem(Long id) {
+//        cartItemRepository.deleteById(id);
+//    }
 
     @Transactional
     public CartItem addCartItemToCart(Long cartId, Long productId, int quantity, double price,String productName, double total, Color color) {
