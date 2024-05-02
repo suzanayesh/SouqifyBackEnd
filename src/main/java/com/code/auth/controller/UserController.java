@@ -30,11 +30,13 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin
 public class UserController {
   @Autowired
   private UserInfoService service;
@@ -180,11 +182,15 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+  public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
     try {
       Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
       if (authentication.isAuthenticated()) {
-        return jwtService.generateToken(authRequest.getUsername());
+        System.out.println("login is working");
+        String token = jwtService.generateToken(authRequest.getUsername());
+
+        return ResponseEntity.ok(Map.of("token", token));
+
       } else {
         throw new UsernameNotFoundException("Invalid user request!");
       }
