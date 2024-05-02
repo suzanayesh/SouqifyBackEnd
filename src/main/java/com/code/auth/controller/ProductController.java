@@ -1,7 +1,9 @@
 package com.code.auth.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Product;
@@ -63,6 +65,20 @@ public class ProductController {
     public ResponseEntity<Product> addProduct(@PathVariable Long userId, @PathVariable Long id, @RequestBody Product productDetails) {
         Product updatedProduct = productService.addProduct(userId, id, productDetails);
         return ResponseEntity.ok(updatedProduct);
+    }
+    @DeleteMapping("/{productId}")
+    @PreAuthorize("hasAuthority('SUPPLIER_PER')")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long userId, @PathVariable Long productId) {
+        try {
+            productService.deleteProductByUserAndId(userId, productId);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Product successfully deleted.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            // Handle the exception appropriately
+            // e.g., return an error response if the product doesn't exist or the user doesn't have permission to delete it
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     // Example Debug Logging in your deleteProduct method

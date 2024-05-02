@@ -11,6 +11,9 @@ import com.code.auth.entity.*;
 import com.code.auth.repo.OrderRepository;
 import com.code.auth.repo.ProductRepository;
 import com.code.auth.repo.UserInfoRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -26,14 +29,16 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public List<Order> findAllOrders() {
-        return orderRepository.findAll();
-    }
 
-    public Optional<Order> findOrderById(Long id) {
-        return orderRepository.findById(id);
-    }
 
+//    public List<Order> findAllOrders() {
+//        return orderRepository.findAll();
+//    }
+//
+//    public Optional<Order> findOrderById(Long id) {
+//        return orderRepository.findById(id);
+//    }
+//
 
     public Order updateOrder(Long id, OrderDTO orderDTO) {
         Order existingOrder = orderRepository.findById(id)
@@ -145,10 +150,19 @@ public OrderDTO createOrder(OrderDTO orderDTO, Long userId) {
 
 
 
+
+
+
+
     public void deleteOrder(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         orderRepository.delete(order);
     }
+
+
+
+
+
 }
 

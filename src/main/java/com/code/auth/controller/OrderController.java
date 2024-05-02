@@ -23,18 +23,19 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.findAllOrders();
-        return ResponseEntity.ok(orders);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<Order>> getAllOrders() {
+//        List<Order> orders = orderService.findAllOrders();
+//        return ResponseEntity.ok(orders);
+//    }
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+//        return orderService.findOrderById(id)
+//                .map(ResponseEntity::ok)
+//                .orElseGet(() -> ResponseEntity.notFound().build());
+//    }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
-        return orderService.findOrderById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
 
 
     @PostMapping("/{userId}")
@@ -48,6 +49,7 @@ public class OrderController {
         response.put("total", createdOrder.getTotalPrice());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
 
     @PutMapping("/{id}")

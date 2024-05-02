@@ -111,8 +111,16 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void deleteProductByUserAndId(Long userId, Long id) {
-        // Implement delete operation considering the user context
-        productRepository.deleteByIdAndUserId(id, userId);
+
+    @Transactional
+    public void deleteProductByUserAndId(Long userId, Long productId) {
+        // It's clearer in this context to use 'productId' because you're also passing a 'userId'
+        Optional<Product> product = findProductByIdAndUser(userId, productId);
+        if (!product.isPresent()) {
+            throw new RuntimeException("Product not found with id " + productId + " for user " + userId);
+        }
+
+
+        productRepository.deleteByIdAndUserId(productId, userId);
     }
 }

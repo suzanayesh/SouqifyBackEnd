@@ -27,21 +27,21 @@ public class OrderItemController {
         this.orderItemService = orderItemService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderItemDTO> getOrderItemById(@PathVariable Long id) {
-        try {
-            OrderItemDTO orderItemDTO = orderItemService.findOrderItemDTOById(id);
-            return ResponseEntity.ok(orderItemDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<OrderItemDTO> getOrderItemById(@PathVariable Long id) {
+//        try {
+//            OrderItemDTO orderItemDTO = orderItemService.findOrderItemDTOById(id);
+//            return ResponseEntity.ok(orderItemDTO);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//    }
 
-    @GetMapping
-    public ResponseEntity<List<OrderItem>> getAllOrderItems() {
-        List<OrderItem> orderItems = orderItemService.findAllOrderItems();
-        return ResponseEntity.ok(orderItems);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<OrderItem>> getAllOrderItems() {
+//        List<OrderItem> orderItems = orderItemService.findAllOrderItems();
+//        return ResponseEntity.ok(orderItems);
+//    }
     // @GetMapping("/{id}")
     // public ResponseEntity<OrderItemDTO> getOrderItemById(@PathVariable Long id) {
     //     try {
