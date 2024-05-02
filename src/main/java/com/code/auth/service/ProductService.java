@@ -120,7 +120,7 @@ public class ProductService {
             throw new RuntimeException("Product not found with id " + productId + " for user " + userId);
         }
 
-
+//delete
         productRepository.deleteByIdAndUserId(productId, userId);
     }
 }
