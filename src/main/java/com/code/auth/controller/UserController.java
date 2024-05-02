@@ -5,6 +5,7 @@ import com.code.auth.dto.user.UserDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
+import com.code.auth.exception.ErrorResponse;
 import com.code.auth.lookup.ApiResponse;
 import com.code.auth.lookup.Response;
 import com.code.auth.service.JwtService;
@@ -180,40 +181,63 @@ public class UserController {
       return ResponseEntity.notFound().build();
     }
   }
-
   @PostMapping("/login")
   public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
     try {
-      Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-      if (authentication.isAuthenticated()) {
-        System.out.println("login is working");
-        String token = jwtService.generateToken(authRequest.getUsername());
+      Authentication authentication = authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+      );
 
-        return ResponseEntity.ok(Map.of("token", token));
-
-      } else {
-        throw new UsernameNotFoundException("Invalid user request!");
-      }
-    } catch (BadCredentialsException e) {
-      if (e.getMessage().contains("Bad credentials")) {
-        // Handle case where either username or password is incorrect
-
+      if (!authentication.isAuthenticated()) {
         throw new BadCredentialsException("Invalid username or password");
-      } else {
-        // Handle case where username is not found
-        log.error("Username not found");
-        throw new UsernameNotFoundException("Username not found");
       }
-    } catch (UsernameNotFoundException e) {
-      // Handle case where username is not found
-      log.error("Username not found");
-      throw new UsernameNotFoundException("Username not found");
+
+      System.out.println("Login is working");
+      String token = jwtService.generateToken(authRequest.getUsername());
+      return ResponseEntity.ok(Map.of("token", token));
+
+    } catch (BadCredentialsException e) {
+      log.error("Authentication failed: Invalid username or password");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid username or password"));
     } catch (AuthenticationException e) {
-      // Handle other authentication exceptions
       log.error("Authentication failed: " + e.getMessage());
-      throw new AuthenticationException("Authentication failed: " + e.getMessage()) {};
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Authentication failed"));
     }
   }
+
+//  @PostMapping("/login")
+//  public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+//    try {
+//      Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+//      if (authentication.isAuthenticated()) {
+//        System.out.println("login is working");
+//        String token = jwtService.generateToken(authRequest.getUsername());
+//
+//        return ResponseEntity.ok(Map.of("token", token));
+//
+//      } else {
+//        throw new UsernameNotFoundException("Invalid user request!");
+//      }
+//    } catch (BadCredentialsException e) {
+//      if (e.getMessage().contains("Bad credentials")) {
+//        // Handle case where either username or password is incorrect
+//
+//        throw new BadCredentialsException("Invalid username or password");
+//      } else {
+//        // Handle case where username is not found
+//        log.error("Username not found");
+//        throw new UsernameNotFoundException("Username not found");
+//      }
+//    } catch (UsernameNotFoundException e) {
+//      // Handle case where username is not found
+//      log.error("Username not found");
+//      throw new UsernameNotFoundException("Username not found");
+//    } catch (AuthenticationException e) {
+//      // Handle other authentication exceptions
+//      log.error("Authentication failed: " + e.getMessage());
+//      throw new AuthenticationException("Authentication failed: " + e.getMessage()) {};
+//    }
+//  }
 
 
 
