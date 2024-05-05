@@ -1,6 +1,7 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.AuthRequest;
+import com.code.auth.dto.user.SimpleUserInfo;
 import com.code.auth.dto.user.UserDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
@@ -136,12 +137,21 @@ public class UserController {
     }
     return ResponseEntity.notFound().build();
   }
-  @GetMapping("/search/{name}")
-  public ResponseEntity<UserInfo> getUserByUsername(@PathVariable String name) {
-    return userService.getUserByName(name)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+//  @GetMapping("/search/{name}")
+//  public ResponseEntity<UserInfo> getUserByUsername(@PathVariable String name) {
+//    return userService.getUserByName(name)
+//            .map(ResponseEntity::ok)
+//            .orElseGet(() -> ResponseEntity.notFound().build());
+//  }
+@GetMapping("/search/{name}")
+public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable String name) {
+  List<SimpleUserInfo> users = userService.findUsersByNameContaining(name);
+  if(users.isEmpty()) {
+    return ResponseEntity.notFound().build();
   }
+  return ResponseEntity.ok(users);
+}
+
 
   @GetMapping("/admin/users")
   @PreAuthorize("hasAuthority('ADMIN_PER')")

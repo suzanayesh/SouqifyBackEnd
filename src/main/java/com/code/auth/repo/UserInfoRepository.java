@@ -19,6 +19,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Integer> {
 //  boolean existsByUsername(String username);
   boolean existsByEmail(String email);
   boolean existsByName(String name);
+  List<UserInfo> findByNameContaining(String name);
 
   void deleteById(Long id);
 

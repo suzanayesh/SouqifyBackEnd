@@ -1,5 +1,6 @@
 package com.code.auth.service;
 
+import com.code.auth.dto.user.SimpleUserInfo;
 import com.code.auth.dto.user.UserDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Slf4j
 
 @Service
@@ -135,6 +138,15 @@ public class UserInfoService implements UserDetailsService {
         }
 
         return "User created successfully with ID: " + savedUser.getId();
+    }
+    public List<SimpleUserInfo> findUsersByNameContaining(String name) {
+        return userInfoRepository.findByNameContaining(name)
+                .stream()
+                .map(user -> new SimpleUserInfo(
+                        user.getName(),
+                        user.getStorename(),
+                        user.getRole().getName()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
