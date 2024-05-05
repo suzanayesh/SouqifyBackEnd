@@ -40,11 +40,29 @@ public class ProductController {
     }
 
     // This method adds a product based on ProductDto to a specific user
+//    @PostMapping("supplier/addProduct")
+//    @PreAuthorize("hasAuthority('SUPPLIER_PER')")
+//    public ResponseEntity<Product> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
+//        Product savedProduct = productService.addProductToUser(userId, productDto);
+//        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+//    }
     @PostMapping("supplier/addProduct")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
-    public ResponseEntity<Product> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
+    public ResponseEntity<Map<String, Object>> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
         Product savedProduct = productService.addProductToUser(userId, productDto);
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+
+        // Create a custom response JSON object
+        Map<String, Object> response = new HashMap<>();
+        response.put("productName", savedProduct.getProductName());
+        response.put("description", savedProduct.getDescription());
+        response.put("price", savedProduct.getPrice());
+        response.put("stockQuantity", savedProduct.getStockQuantity());
+        response.put("categoryId", savedProduct.getCategory().getCategoryId());
+        response.put("availableSizes", savedProduct.getAvailableSizes());
+        response.put("availableColors", savedProduct.getAvailableColors());
+        response.put("brand", savedProduct.getBrand());
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 //    @GetMapping("/{id}")
