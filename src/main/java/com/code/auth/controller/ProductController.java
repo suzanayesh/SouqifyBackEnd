@@ -98,6 +98,14 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+    @GetMapping("/search/products/{name}")
+    public ResponseEntity<List<ProductDto>> searchProducts(@PathVariable String name) {
+        List<ProductDto> products = productService.searchProductsByName(name);
+        if (products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(products);
+    }
 
     // Example Debug Logging in your deleteProduct method
 //    @DeleteMapping("supplier/{userId}/removeProduct/{id}")

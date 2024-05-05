@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     void deleteByIdAndUserId(Long productId, Long userId);
+    List<Product> findByProductNameContainingIgnoreCase(String productName);
 
     List<Product> findAllByUserId(Long userId);
     Optional<Product> findByIdAndUserId(Long productId, Long userId);

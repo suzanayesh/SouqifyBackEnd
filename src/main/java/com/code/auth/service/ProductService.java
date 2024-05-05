@@ -4,6 +4,7 @@ package com.code.auth.service;
 import java.beans.Transient;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Category;
@@ -111,7 +112,21 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-
+    public List<ProductDto> searchProductsByName(String name) {
+        return productRepository.findByProductNameContainingIgnoreCase(name)
+                .stream()
+                .map(product -> new ProductDto(
+                        product.getId(),
+                        product.getProductName(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getBrand(),
+                        product.getCategory().getCategoryId(),
+                        product.getStockQuantity(),
+                        product.getAvailableSizes(),
+                        product.getAvailableColors()))
+                .collect(Collectors.toList());
+    }
     @Transactional
     public void deleteProductByUserAndId(Long userId, Long productId) {
         // It's clearer in this context to use 'productId' because you're also passing a 'userId'
