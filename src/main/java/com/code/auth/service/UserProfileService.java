@@ -15,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.Optional;
 @Service
 public class UserProfileService {
 
@@ -56,4 +56,8 @@ public class UserProfileService {
 //
         return userProfileRepository.save(profile);
     }
+    public Optional<UserProfile> getUserProfile(Long userId) {
+        return userProfileRepository.findById(userId);
+    }
+
 }
