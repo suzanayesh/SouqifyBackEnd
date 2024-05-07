@@ -5,11 +5,13 @@ import com.code.auth.dto.user.UserDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
+import com.code.auth.entity.UserProfile;
 import com.code.auth.exception.EmailExistsException;
 import com.code.auth.exception.UsernameExistsException;
 import com.code.auth.repo.RoleRepository;
 import com.code.auth.repo.UserInfoRepository;
 import com.code.auth.config.UserInfoDetails;
+import com.code.auth.repo.UserProfileRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserInfoService implements UserDetailsService {
+    @Autowired
+    private UserProfileRepository userProfileRepository;
 
     @Autowired
     private UserInfoRepository userInfoRepository;
@@ -130,6 +134,14 @@ public class UserInfoService implements UserDetailsService {
         UserInfo savedUser = userInfoRepository.save(user);
         log.info("User saved successfully with ID: {}", savedUser.getId());
 
+        // Create UserProfile with null initial values
+        UserProfile userProfile = new UserProfile();
+        userProfile.setProfileId((long) savedUser.getId()); // Link the UserProfile to the saved UserInfo
+        userProfile.setUser(savedUser);
+        userProfile.setEmail(savedUser.getEmail()); // Assuming you want to replicate the email
+        userProfileRepository.save(userProfile);
+        log.info("UserProfile created with default null values for User ID: {}", savedUser.getId());
+
         if ("retailer".equalsIgnoreCase(role.getName())) {
             Cart newCart = new Cart();
             newCart.setUser(savedUser);
@@ -139,6 +151,7 @@ public class UserInfoService implements UserDetailsService {
 
         return "User created successfully with ID: " + savedUser.getId();
     }
+
     public List<SimpleUserInfo> findUsersByNameContaining(String name) {
         return userInfoRepository.findByNameContaining(name)
                 .stream()
