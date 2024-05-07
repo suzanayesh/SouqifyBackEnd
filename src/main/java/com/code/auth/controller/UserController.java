@@ -73,13 +73,24 @@ public class UserController {
       UserProfile userProfile = userProfileRepository.findByUser(newUser)
               .orElseThrow(() -> new Exception("UserProfile not found for user ID: " + newUser.getId()));
 
+      Map<String, Object> profileMap = new HashMap<>();
+      profileMap.put("profileId", userProfile.getProfileId());
+      profileMap.put("email", userProfile.getEmail() != null ? userProfile.getEmail() : "");
+      profileMap.put("socialMediaTelegram", userProfile.getSocialMediaTelegram() != null ? userProfile.getSocialMediaTelegram() : "");
+      profileMap.put("phoneNumber", userProfile.getPhoneNumber() != null ? userProfile.getPhoneNumber() : "");
+      profileMap.put("socialMediaInstagram", userProfile.getSocialMediaInstagram() != null ? userProfile.getSocialMediaInstagram() : "");
+      profileMap.put("description", userProfile.getDescription() != null ? userProfile.getDescription() : "");
+      profileMap.put("location", userProfile.getLocation() != null ? userProfile.getLocation() : "");
+      profileMap.put("storeWebLink", userProfile.getStoreWebLink() != null ? userProfile.getStoreWebLink() : "");
+      profileMap.put("socialMediaFacebook", userProfile.getSocialMediaFacebook() != null ? userProfile.getSocialMediaFacebook() : "");
+
       Map<String, Object> response = new HashMap<>();
       response.put("message", "Account created successfully! Welcome, " + newUser.getName());
       response.put("userId", newUser.getId());
       response.put("username", newUser.getName());
       response.put("email", newUser.getEmail());
       response.put("storeName", newUser.getStorename());
-      response.put("profile", userProfile);
+      response.put("profile", profileMap);
 
       return ResponseEntity.ok(response);
     } catch (EmailExistsException | UsernameExistsException e) {
@@ -88,6 +99,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Failed to create user account"));
     }
   }
+
 
 //@PostMapping("/signup")
 //public ResponseEntity<?> signupUser(@RequestBody UserDto newUser) {
