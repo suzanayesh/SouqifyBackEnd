@@ -6,9 +6,13 @@ import com.code.auth.dto.user.UserDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
+import com.code.auth.entity.UserProfile;
+import com.code.auth.exception.EmailExistsException;
 import com.code.auth.exception.ErrorResponse;
+import com.code.auth.exception.UsernameExistsException;
 import com.code.auth.lookup.ApiResponse;
 import com.code.auth.lookup.Response;
+import com.code.auth.repo.UserProfileRepository;
 import com.code.auth.service.JwtService;
 import com.code.auth.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +34,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -42,7 +43,8 @@ import java.util.Optional;
 public class UserController {
   @Autowired
   private UserInfoService service;
-
+  @Autowired
+  private UserProfileRepository userProfileRepository;
   @Autowired
   private JwtService jwtService;
   private final UserInfoService userService;
@@ -61,9 +63,28 @@ public class UserController {
   }
 
   @PostMapping("/signup")
-  public String addNewUser(@RequestBody UserDto userDto) {
-    return service.addUser(userDto);
+  public ResponseEntity<?> addNewUser(@RequestBody UserDto userDto) {
+    try {
+      UserInfo newUser = service.addUser(userDto);
+      UserProfile userProfile = userProfileRepository.findByUser(newUser)
+              .orElseThrow(() -> new Exception("UserProfile not found for user ID: " + newUser.getId()));
+
+      Map<String, Object> response = new HashMap<>();
+      response.put("message", "Account created successfully! Welcome, " + newUser.getName());
+      response.put("userId", newUser.getId());
+      response.put("username", newUser.getName());
+      response.put("email", newUser.getEmail());
+      response.put("storeName", newUser.getStorename());
+      response.put("profile", userProfile);
+
+      return ResponseEntity.ok(response);
+    } catch (EmailExistsException | UsernameExistsException e) {
+      return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Failed to create user account"));
+    }
   }
+
 //@PostMapping("/signup")
 //public ResponseEntity<?> signupUser(@RequestBody UserDto newUser) {
 //  Role userRole = roleService.getRoleById(newUser.getRoleId());

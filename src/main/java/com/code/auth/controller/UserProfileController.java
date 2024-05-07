@@ -1,6 +1,5 @@
 package com.code.auth.controller;
 
-
 import com.code.auth.dto.user.UserProfileUpdateDto;
 import com.code.auth.entity.UserProfile;
 import com.code.auth.exception.ResourceNotFoundException;
@@ -18,15 +17,42 @@ public class UserProfileController {
     private UserProfileService userProfileService;
 
     @PutMapping("/update")
-    public ResponseEntity<UserProfile> updateUserProfile(@RequestBody UserProfileUpdateDto updateDto) {
+    public ResponseEntity<?> updateUserProfile(@RequestBody UserProfileUpdateDto updateDto) {
         try {
             UserProfile updatedProfile = userProfileService.updateProfile(updateDto);
-            return ResponseEntity.ok(updatedProfile);
+            return ResponseEntity.ok().body(new ApiResponse(true, "Profile updated successfully", updatedProfile));
         } catch (UsernameNotFoundException | ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new ApiResponse(false, "User profile not found, failed to update. Try again.", null));
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(null); // Or customize the response to convey the issue
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email already in use, failed to update. Try again.", null));
+        } catch (Exception e) {
+            // General exception handler for any other unexpected errors
+            return ResponseEntity.internalServerError().body(new ApiResponse(false, "Failed to update profile. Try again.", null));
+        }
+    }
+
+    // Inner class to handle response objects
+    private static class ApiResponse {
+        private boolean success;
+        private String message;
+        private Object data;
+
+        public ApiResponse(boolean success, String message, Object data) {
+            this.success = success;
+            this.message = message;
+            this.data = data;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public Object getData() {
+            return data;
         }
     }
 }
-

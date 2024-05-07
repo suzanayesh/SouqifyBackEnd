@@ -109,7 +109,7 @@ public class UserInfoService implements UserDetailsService {
     @Autowired
     private CartService cartService;
     @Transactional
-    public String addUser(UserDto userDto) {
+    public UserInfo addUser(UserDto userDto) {
         log.info("Checking if user email already exists");
         if (userInfoRepository.findByEmail(userDto.getEmail()).isPresent()) {
             log.error("Email already exists: {}", userDto.getEmail());
@@ -130,17 +130,15 @@ public class UserInfoService implements UserDetailsService {
         user.setRole(role);
         user.setStorename(userDto.getStorename());
 
-        // Save the UserInfo object and assign the result to savedUser
         UserInfo savedUser = userInfoRepository.save(user);
         log.info("User saved successfully with ID: {}", savedUser.getId());
 
-        // Create UserProfile with null initial values
         UserProfile userProfile = new UserProfile();
-        userProfile.setProfileId((long) savedUser.getId()); // Link the UserProfile to the saved UserInfo
+        userProfile.setProfileId((long) savedUser.getId());
         userProfile.setUser(savedUser);
-        userProfile.setEmail(savedUser.getEmail()); // Assuming you want to replicate the email
+        userProfile.setEmail(savedUser.getEmail());
         userProfileRepository.save(userProfile);
-        log.info("UserProfile created with default null values for User ID: {}", savedUser.getId());
+        log.info("UserProfile created for User ID: {}", savedUser.getId());
 
         if ("retailer".equalsIgnoreCase(role.getName())) {
             Cart newCart = new Cart();
@@ -149,7 +147,7 @@ public class UserInfoService implements UserDetailsService {
             log.info("Cart created for retailer with ID: {}", savedUser.getId());
         }
 
-        return "User created successfully with ID: " + savedUser.getId();
+        return savedUser;
     }
 
     public List<SimpleUserInfo> findUsersByNameContaining(String name) {
