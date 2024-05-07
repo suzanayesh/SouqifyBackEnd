@@ -9,9 +9,11 @@ import com.code.auth.entity.UserInfo;
 import com.code.auth.entity.UserProfile;
 import com.code.auth.exception.EmailExistsException;
 import com.code.auth.exception.ErrorResponse;
+import com.code.auth.exception.ResourceNotFoundException;
 import com.code.auth.exception.UsernameExistsException;
 import com.code.auth.lookup.ApiResponse;
 import com.code.auth.lookup.Response;
+import com.code.auth.repo.UserInfoRepository;
 import com.code.auth.repo.UserProfileRepository;
 import com.code.auth.service.JwtService;
 import com.code.auth.service.UserInfoService;
@@ -54,6 +56,8 @@ public class UserController {
     this.userService = userService;
   }
 
+  @Autowired
+  private UserInfoRepository userInfoRepository;
   @Autowired
   private AuthenticationManager authenticationManager;
 
@@ -116,6 +120,7 @@ public class UserController {
       return ResponseEntity.notFound().build();
     }
   }
+
   @GetMapping("/user/SupplierProfile")
   @PreAuthorize("hasAuthority('SUPPLIER_PER')")
   public ResponseEntity<ApiResponse<UserInfo>> supplierProfile(@AuthenticationPrincipal UserDetails userDetails) {
@@ -130,6 +135,7 @@ public class UserController {
       return ResponseEntity.notFound().build();
     }
   }
+
   @PutMapping("user/Supplier/{id}")
   @PreAuthorize("hasAuthority('SUPPLIER_PER')")
   public ResponseEntity<UserInfo> updateUser(@PathVariable Long id, @RequestBody UserInfo user) {
@@ -149,6 +155,7 @@ public class UserController {
     }
     return ResponseEntity.notFound().build();
   }
+
   @PutMapping("user/retailer/{id}")
   @PreAuthorize("hasAuthority('RETAILER_PER')")
   public ResponseEntity<UserInfo> updateUser2(@PathVariable Long id, @RequestBody UserInfo user) {
@@ -158,20 +165,21 @@ public class UserController {
     }
     return ResponseEntity.notFound().build();
   }
-//  @GetMapping("/search/{name}")
+
+  //  @GetMapping("/search/{name}")
 //  public ResponseEntity<UserInfo> getUserByUsername(@PathVariable String name) {
 //    return userService.getUserByName(name)
 //            .map(ResponseEntity::ok)
 //            .orElseGet(() -> ResponseEntity.notFound().build());
 //  }
-@GetMapping("/search/{name}")
-public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable String name) {
-  List<SimpleUserInfo> users = userService.findUsersByNameContaining(name);
-  if(users.isEmpty()) {
-    return ResponseEntity.notFound().build();
+  @GetMapping("/search/{name}")
+  public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable String name) {
+    List<SimpleUserInfo> users = userService.findUsersByNameContaining(name);
+    if (users.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(users);
   }
-  return ResponseEntity.ok(users);
-}
 
 
   @GetMapping("/admin/users")
@@ -180,11 +188,13 @@ public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable Stri
     List<UserInfo> users = userService.getAllUsers();
     return ResponseEntity.ok(users);
   }
+
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
     String message = "A user with the given details already exists.";
     return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
   }
+
   @GetMapping("/admin/AdminProfile")
   @PreAuthorize("hasAuthority('ADMIN_PER')")
   public String adminProfile() {
@@ -212,6 +222,7 @@ public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable Stri
       return ResponseEntity.notFound().build();
     }
   }
+
   @PostMapping("/login")
   public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
     try {
@@ -223,9 +234,31 @@ public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable Stri
         throw new BadCredentialsException("Invalid username or password");
       }
 
-      System.out.println("Login is working");
       String token = jwtService.generateToken(authRequest.getUsername());
-      return ResponseEntity.ok(Map.of("token", token));
+      UserInfo userInfo = userInfoRepository.findByName(authRequest.getUsername())
+              .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+      UserProfile userProfile = userProfileRepository.findByUser(userInfo)
+              .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+
+      // Preparing user profile data, ensuring null is handled as empty string for each field
+      Map<String, Object> profileMap = new HashMap<>();
+      profileMap.put("profileId", userProfile.getProfileId() != null ? userProfile.getProfileId() : "");
+      profileMap.put("location", userProfile.getLocation() != null ? userProfile.getLocation() : "");
+      profileMap.put("storeWebLink", userProfile.getStoreWebLink() != null ? userProfile.getStoreWebLink() : "");
+      profileMap.put("phoneNumber", userProfile.getPhoneNumber() != null ? userProfile.getPhoneNumber() : "");
+      profileMap.put("description", userProfile.getDescription() != null ? userProfile.getDescription() : "");
+      profileMap.put("socialMediaFacebook", userProfile.getSocialMediaFacebook() != null ? userProfile.getSocialMediaFacebook() : "");
+      profileMap.put("socialMediaTelegram", userProfile.getSocialMediaTelegram() != null ? userProfile.getSocialMediaTelegram() : "");
+      profileMap.put("socialMediaInstagram", userProfile.getSocialMediaInstagram() != null ? userProfile.getSocialMediaInstagram() : "");
+      profileMap.put("email", userProfile.getUser().getEmail() != null ? userProfile.getUser().getEmail() : ""); // Assuming the email is not null
+
+      Map<String, Object> response = new HashMap<>();
+      response.put("token", token);
+      response.put("message", "Welcome " + userInfo.getName() + ", logged in successfully.");
+      response.put("profile", profileMap);
+
+      return ResponseEntity.ok(response);
 
     } catch (BadCredentialsException e) {
       log.error("Authentication failed: Invalid username or password");
@@ -235,6 +268,7 @@ public ResponseEntity<List<SimpleUserInfo>> searchUsersByName(@PathVariable Stri
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Authentication failed"));
     }
   }
+
 
 //  @PostMapping("/login")
 //  public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
