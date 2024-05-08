@@ -1,21 +1,26 @@
 package com.code.auth.controller;
 
+import com.code.auth.dto.user.UserProfileAddRateCommentDto;
 import com.code.auth.dto.user.UserProfileUpdateDto;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.entity.UserProfile;
 import com.code.auth.exception.ErrorResponse;
 import com.code.auth.exception.ResourceNotFoundException;
 import com.code.auth.repo.UserInfoRepository;
+import com.code.auth.repo.UserProfileRepository;
 import com.code.auth.service.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/userProfile")
@@ -39,7 +44,19 @@ public class UserProfileController {
         }
     }
 
-    // Inner class to handle response objects
+//    @PostMapping("/addrateComment")
+//    public ResponseEntity<?> addRateAndComment(@RequestBody UserProfileAddRateCommentDto rateCommentDto) {
+//        try {
+//            UserProfile updatedProfile = userProfileService.addRatingAndComment(rateCommentDto);
+//            return ResponseEntity.ok().body(new ApiResponse(true, "Rating and comment added successfully", updatedProfile));
+//        } catch (ResourceNotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body(new ApiResponse(false, "Failed to add rating and comment", null));
+//        }
+//    }
+
+
     private static class ApiResponse {
         private boolean success;
         private String message;
@@ -64,35 +81,5 @@ public class UserProfileController {
         }
     }
 
-    @Autowired
-    private UserInfoRepository userInfoRepository;
 
-    @GetMapping("/profile")
-    public ResponseEntity<Map<String, Object>> getUserProfile() {
-        try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserInfo userInfo = userInfoRepository.findByName(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-
-            UserProfile userProfile = userProfileService.getUserProfile((long) userInfo.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("UserProfile not found for user: " + username));
-
-            Map<String, Object> profileMap = new HashMap<>();
-            profileMap.put("profileId", userProfile.getProfileId());
-            profileMap.put("email", userProfile.getEmail() != null ? userProfile.getEmail() : "");
-            profileMap.put("socialMediaTelegram", userProfile.getSocialMediaTelegram() != null ? userProfile.getSocialMediaTelegram() : "");
-            profileMap.put("phoneNumber", userProfile.getPhoneNumber() != null ? userProfile.getPhoneNumber() : "");
-            profileMap.put("socialMediaInstagram", userProfile.getSocialMediaInstagram() != null ? userProfile.getSocialMediaInstagram() : "");
-            profileMap.put("description", userProfile.getDescription() != null ? userProfile.getDescription() : "");
-            profileMap.put("location", userProfile.getLocation() != null ? userProfile.getLocation() : "");
-            profileMap.put("storeWebLink", userProfile.getStoreWebLink() != null ? userProfile.getStoreWebLink() : "");
-            profileMap.put("socialMediaFacebook", userProfile.getSocialMediaFacebook() != null ? userProfile.getSocialMediaFacebook() : "");
-
-            return ResponseEntity.ok(Map.of("profile", profileMap));
-        } catch (UsernameNotFoundException | ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An error occurred while retrieving the profile"));
-        }
-    }
 }
