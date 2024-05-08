@@ -65,7 +65,6 @@ public class UserController {
   public String welcome() {
     return "Welcome this endpoint is not secure";
   }
-
   @PostMapping("/signup")
   public ResponseEntity<?> addNewUser(@RequestBody UserDto userDto) {
     try {
@@ -73,24 +72,16 @@ public class UserController {
       UserProfile userProfile = userProfileRepository.findByUser(newUser)
               .orElseThrow(() -> new Exception("UserProfile not found for user ID: " + newUser.getId()));
 
-      Map<String, Object> profileMap = new HashMap<>();
-      profileMap.put("profileId", userProfile.getProfileId());
-      profileMap.put("email", userProfile.getEmail() != null ? userProfile.getEmail() : "");
-      profileMap.put("socialMediaTelegram", userProfile.getSocialMediaTelegram() != null ? userProfile.getSocialMediaTelegram() : "");
-      profileMap.put("phoneNumber", userProfile.getPhoneNumber() != null ? userProfile.getPhoneNumber() : "");
-      profileMap.put("socialMediaInstagram", userProfile.getSocialMediaInstagram() != null ? userProfile.getSocialMediaInstagram() : "");
-      profileMap.put("description", userProfile.getDescription() != null ? userProfile.getDescription() : "");
-      profileMap.put("location", userProfile.getLocation() != null ? userProfile.getLocation() : "");
-      profileMap.put("storeWebLink", userProfile.getStoreWebLink() != null ? userProfile.getStoreWebLink() : "");
-      profileMap.put("socialMediaFacebook", userProfile.getSocialMediaFacebook() != null ? userProfile.getSocialMediaFacebook() : "");
+      // Assume you have a method to generate a token for a given username
+      String token = jwtService.generateToken(newUser.getEmail());
 
       Map<String, Object> response = new HashMap<>();
       response.put("message", "Account created successfully! Welcome, " + newUser.getName());
       response.put("userId", newUser.getId());
       response.put("username", newUser.getName());
       response.put("email", newUser.getEmail());
-      response.put("storeName", newUser.getStorename());
-      response.put("profile", profileMap);
+      response.put("roleId", newUser.getRole().getId()); // Assuming Role is a field in UserInfo
+      response.put("token", token);
 
       return ResponseEntity.ok(response);
     } catch (EmailExistsException | UsernameExistsException e) {
@@ -253,22 +244,14 @@ public class UserController {
       UserProfile userProfile = userProfileRepository.findByUser(userInfo)
               .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
-      // Preparing user profile data, ensuring null is handled as empty string for each field
-      Map<String, Object> profileMap = new HashMap<>();
-      profileMap.put("profileId", userProfile.getProfileId() != null ? userProfile.getProfileId() : "");
-      profileMap.put("location", userProfile.getLocation() != null ? userProfile.getLocation() : "");
-      profileMap.put("storeWebLink", userProfile.getStoreWebLink() != null ? userProfile.getStoreWebLink() : "");
-      profileMap.put("phoneNumber", userProfile.getPhoneNumber() != null ? userProfile.getPhoneNumber() : "");
-      profileMap.put("description", userProfile.getDescription() != null ? userProfile.getDescription() : "");
-      profileMap.put("socialMediaFacebook", userProfile.getSocialMediaFacebook() != null ? userProfile.getSocialMediaFacebook() : "");
-      profileMap.put("socialMediaTelegram", userProfile.getSocialMediaTelegram() != null ? userProfile.getSocialMediaTelegram() : "");
-      profileMap.put("socialMediaInstagram", userProfile.getSocialMediaInstagram() != null ? userProfile.getSocialMediaInstagram() : "");
-      profileMap.put("email", userProfile.getUser().getEmail() != null ? userProfile.getUser().getEmail() : ""); // Assuming the email is not null
 
       Map<String, Object> response = new HashMap<>();
       response.put("token", token);
       response.put("message", "Welcome " + userInfo.getName() + ", logged in successfully.");
-      response.put("profile", profileMap);
+      response.put("userId", userInfo.getId());
+      response.put("username", userInfo.getName());
+      response.put("roleId", userInfo.getRole().getId()); // Assuming Role is a direct field in UserInfo
+      response.put("email", userInfo.getEmail() );  // Assuming the email is not null
 
       return ResponseEntity.ok(response);
 
@@ -280,6 +263,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Authentication failed"));
     }
   }
+
 
 
 //  @PostMapping("/login")

@@ -1,7 +1,7 @@
 package com.code.auth.entity;
-
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,12 +22,10 @@ public class UserProfile {
     @Id
     private Long profileId;
 
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private UserInfo user;
-
 
     @Column(name = "location")
     private String location;
@@ -53,4 +51,12 @@ public class UserProfile {
     @Column(name = "social_media_instagram")
     private String socialMediaInstagram;
 
+    @Column(name = "rating", nullable = true)
+    @Min(1) @Max(5)
+    private Integer rating;
+    @Column(name = "profile_image", nullable = true)
+    private String profileImage;  // URL to the profile image
+
+    @Column(name = "cover_image", nullable = true)
+    private String coverImage;  // URL to the cover image
 }
