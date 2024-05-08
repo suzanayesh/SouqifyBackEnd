@@ -41,8 +41,8 @@ public class CartItem {
     @Column(nullable = false)
     private double price;
     @Enumerated(EnumType.STRING)
-    @Column(name = "color")
-    private Color color;
+//    @Column(name = "color")
+//    private Color color;
 
     @Transient  // This field is not stored in the database, it's calculated on the fly
     private double total;

@@ -68,7 +68,7 @@ public class CartService {
                 existingItem.setQuantity(itemDetails.getQuantity());
                 existingItem.setPrice(itemDetails.getPrice());
                 // Update other fields as necessary
-                existingItem.setColor(itemDetails.getColor());
+//                existingItem.setColor(itemDetails.getColor());
                 existingItem.setTotal(itemDetails.getTotal());
                 existingItem.setProductName(itemDetails.getProductName());
 

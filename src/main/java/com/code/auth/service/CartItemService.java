@@ -7,7 +7,6 @@ import java.util.Optional;
 import com.code.auth.dto.user.CartItemDTO;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.CartItem;
-import com.code.auth.entity.Color;
 import com.code.auth.entity.Product;
 import com.code.auth.repo.CartItemRepository;
 import com.code.auth.repo.CartRepository;
@@ -70,7 +69,7 @@ public CartItem updateCartItem(Long id, int quantity, double price) {
 //    }
 
     @Transactional
-    public CartItem addCartItemToCart(Long cartId, Long productId, int quantity, double price,String productName, double total, Color color) {
+    public CartItem addCartItemToCart(Long cartId, Long productId, int quantity, double price,String productName, double total) {
         if (cartId == null || productId == null) {
             throw new IllegalArgumentException("Cart ID and Product ID must not be null");
         }
@@ -84,7 +83,6 @@ public CartItem updateCartItem(Long id, int quantity, double price) {
         cartItem.setProduct(product);
         cartItem.setQuantity(quantity);
         cartItem.setPrice(price);
-        cartItem.setColor(color);
         cartItem.setProductName(productName);
         cartItem.setTotal(price*quantity); // Calculate total
 
@@ -96,7 +94,6 @@ public CartItem updateCartItem(Long id, int quantity, double price) {
         dto.setProductName(cartItem.getProductName());
         dto.setQuantity(cartItem.getQuantity());
         dto.setPrice(cartItem.getPrice());
-        dto.setColor(cartItem.getColor());
         dto.setTotal(cartItem.getTotal());
         return dto;
     }

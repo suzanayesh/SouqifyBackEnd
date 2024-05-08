@@ -40,7 +40,7 @@ public class CartItemController {
     }
     @PostMapping("/add/{cartId}")
     public ResponseEntity<CartItem> addCartItemToCart(@PathVariable Long cartId, @RequestBody CartItemDTO cartItemRequest) {
-        CartItem cartItem = cartItemService.addCartItemToCart(cartId, cartItemRequest.getProductId(), cartItemRequest.getQuantity(), cartItemRequest.getPrice(), cartItemRequest.getProductName(),cartItemRequest.getTotal(),cartItemRequest.getColor());
+        CartItem cartItem = cartItemService.addCartItemToCart(cartId, cartItemRequest.getProductId(), cartItemRequest.getQuantity(), cartItemRequest.getPrice(), cartItemRequest.getProductName(),cartItemRequest.getTotal());
         return ResponseEntity.ok(cartItem);
     }
 

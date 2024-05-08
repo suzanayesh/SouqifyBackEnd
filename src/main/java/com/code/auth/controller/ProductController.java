@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/users/{userId}/products")
+@RequestMapping("/products")
 public class ProductController {
 //    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
@@ -46,6 +46,34 @@ public class ProductController {
 //        Product savedProduct = productService.addProductToUser(userId, productDto);
 //        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
 //    }
+
+
+    @GetMapping(value = "get-all-by-category/{categoryId}")
+    public ResponseEntity<?> getAllByCategory(@PathVariable Long categoryId){
+        List<Product> result = productService.findAllByCategoryId(categoryId);
+        return ResponseEntity.ok(result);
+    }
+    // old product
+//    @PostMapping("supplier/addProduct")
+//    @PreAuthorize("hasAuthority('SUPPLIER_PER')")
+//    public ResponseEntity<Map<String, Object>> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
+//        Product savedProduct = productService.addProductToUser(userId, productDto);
+//
+//        // Create a custom response JSON object
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("productName", savedProduct.getProductName());
+//        response.put("description", savedProduct.getDescription());
+//        response.put("price", savedProduct.getPrice());
+//        response.put("stockQuantity", savedProduct.getStockQuantity());
+//        response.put("categoryId", savedProduct.getCategory().getCategoryId());
+//        response.put("availableSizes", savedProduct.getAvailableSizes());
+//        response.put("availableColors", savedProduct.getAvailableColors());
+//        response.put("brand", savedProduct.getBrand());
+//
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
+
+
     @PostMapping("supplier/addProduct")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
     public ResponseEntity<Map<String, Object>> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
@@ -58,12 +86,13 @@ public class ProductController {
         response.put("price", savedProduct.getPrice());
         response.put("stockQuantity", savedProduct.getStockQuantity());
         response.put("categoryId", savedProduct.getCategory().getCategoryId());
-        response.put("availableSizes", savedProduct.getAvailableSizes());
-        response.put("availableColors", savedProduct.getAvailableColors());
+        response.put("availableSizes", savedProduct.getAvailableSizes()); // Assumed to be JSON-parsed in service
+        response.put("availableColors", savedProduct.getAvailableColors()); // Assumed to be JSON-parsed in service
         response.put("brand", savedProduct.getBrand());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
 //    @GetMapping("/{id}")
 //    public ResponseEntity<Product> getProductByIdAndUser(@PathVariable Long userId, @PathVariable Long id) {
@@ -79,11 +108,11 @@ public class ProductController {
 //        List<Product> products = productService.findProductsByName(productName);
 //        return products.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(products);
 //    }
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> addProduct(@PathVariable Long userId, @PathVariable Long id, @RequestBody Product productDetails) {
-        Product updatedProduct = productService.addProduct(userId, id, productDetails);
-        return ResponseEntity.ok(updatedProduct);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Product> addProduct(@PathVariable Long userId, @PathVariable Long id, @RequestBody Product productDetails) {
+//        Product updatedProduct = productService.addProduct(userId, id, productDetails);
+//        return ResponseEntity.ok(updatedProduct);
+//    }
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long userId, @PathVariable Long productId) {
