@@ -46,7 +46,7 @@ public class SecurityConfig {
             .and()
             .authorizeHttpRequests().requestMatchers("/auth/admin/**","/categories/**").authenticated()
             .and()
-            .authorizeHttpRequests().requestMatchers("/users/{userId}/products/**").authenticated()
+            .authorizeHttpRequests().requestMatchers("/products/**").authenticated()
             .and()
             .authorizeHttpRequests().requestMatchers("/retailer/carts/**","/cart/cartItems/**","/orders/**").authenticated()
             .and()

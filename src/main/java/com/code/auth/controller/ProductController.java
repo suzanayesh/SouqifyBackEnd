@@ -7,12 +7,15 @@ import java.util.Map;
 
 import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Product;
+import com.code.auth.entity.UserInfo;
 import com.code.auth.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/users/{userId}/products")
+@RequestMapping("/products")
 public class ProductController {
 //    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
@@ -46,12 +49,40 @@ public class ProductController {
 //        Product savedProduct = productService.addProductToUser(userId, productDto);
 //        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
 //    }
+
+
+    @GetMapping(value = "get-all-by-category/{categoryId}")
+    public ResponseEntity<?> getAllByCategory(@PathVariable Long categoryId){
+        List<Product> result = productService.findAllByCategoryId(categoryId);
+        return ResponseEntity.ok(result);
+    }
+    // old product
+//    @PostMapping("supplier/addProduct")
+//    @PreAuthorize("hasAuthority('SUPPLIER_PER')")
+//    public ResponseEntity<Map<String, Object>> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
+//        Product savedProduct = productService.addProductToUser(userId, productDto);
+//
+//        // Create a custom response JSON object
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("productName", savedProduct.getProductName());
+//        response.put("description", savedProduct.getDescription());
+//        response.put("price", savedProduct.getPrice());
+//        response.put("stockQuantity", savedProduct.getStockQuantity());
+//        response.put("categoryId", savedProduct.getCategory().getCategoryId());
+//        response.put("availableSizes", savedProduct.getAvailableSizes());
+//        response.put("availableColors", savedProduct.getAvailableColors());
+//        response.put("brand", savedProduct.getBrand());
+//
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
+
+
     @PostMapping("supplier/addProduct")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
-    public ResponseEntity<Map<String, Object>> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
+    public ResponseEntity<Map<String, Object>> addProductToUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProductDto productDto) {
+        Long userId = (long) ((UserInfo) userDetails).getId(); // This assumes you have a custom User class that extends UserDetails and has a getId() method.
         Product savedProduct = productService.addProductToUser(userId, productDto);
 
-        // Create a custom response JSON object
         Map<String, Object> response = new HashMap<>();
         response.put("productName", savedProduct.getProductName());
         response.put("description", savedProduct.getDescription());
@@ -64,6 +95,8 @@ public class ProductController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+
 
 //    @GetMapping("/{id}")
 //    public ResponseEntity<Product> getProductByIdAndUser(@PathVariable Long userId, @PathVariable Long id) {
@@ -79,11 +112,11 @@ public class ProductController {
 //        List<Product> products = productService.findProductsByName(productName);
 //        return products.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(products);
 //    }
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> addProduct(@PathVariable Long userId, @PathVariable Long id, @RequestBody Product productDetails) {
-        Product updatedProduct = productService.addProduct(userId, id, productDetails);
-        return ResponseEntity.ok(updatedProduct);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Product> addProduct(@PathVariable Long userId, @PathVariable Long id, @RequestBody Product productDetails) {
+//        Product updatedProduct = productService.addProduct(userId, id, productDetails);
+//        return ResponseEntity.ok(updatedProduct);
+//    }
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long userId, @PathVariable Long productId) {
