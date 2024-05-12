@@ -20,5 +20,7 @@ public class UserInfo {
   private Role role;
 
 
+  @Column(name = "profile_image")
+  private String profileImage;
 
 }

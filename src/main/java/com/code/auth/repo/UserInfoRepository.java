@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface UserInfoRepository extends JpaRepository<UserInfo, Integer> {
   Optional<UserInfo> findByName(String name);
+
   Optional<UserInfo> findByEmail(String email);
   List<UserInfo> findByRole(Role role);
 //  Optional<UserInfo> findById(int userId); // where 1 is an Integer

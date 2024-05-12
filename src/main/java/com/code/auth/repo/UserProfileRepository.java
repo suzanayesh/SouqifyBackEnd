@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
     // Here, Long is the data type of the primary key of UserProfile which is userId
     Optional<UserProfile> findByUser(UserInfo user);
+    UserProfile findByUsername(String username);  // Ensure this method is defined
 
     // You can define custom methods here, for example:
 //    UserProfile findByUserId(Long userId);

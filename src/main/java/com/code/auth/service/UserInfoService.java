@@ -16,6 +16,8 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,6 +47,15 @@ public class UserInfoService implements UserDetailsService {
     @Autowired
     private PasswordEncoder encoder;
 
+
+    public UserInfo getCurrentUserInfo() throws RuntimeException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal(); // Cast to your UserDetails implementation
+        String username = userDetails.getUsername(); // Obtain the username from UserDetails
+
+        return userInfoRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserInfo> userDetail = userInfoRepository.findByName(username);
