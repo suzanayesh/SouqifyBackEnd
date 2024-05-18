@@ -2,7 +2,6 @@ package com.code.auth.repo;
 
 import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
-import io.micrometer.observation.ObservationFilter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

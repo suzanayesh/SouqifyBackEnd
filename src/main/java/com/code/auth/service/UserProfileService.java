@@ -78,7 +78,7 @@ public class UserProfileService {
         profile.setSocialMediaTelegram(updateDto.getSocialMediaTelegram());
         profile.setSocialMediaInstagram(updateDto.getSocialMediaInstagram());
         profile.setProfileImage(updateDto.getProfileImage()); // Handling profile image URL update
-        profile.setCoverImage(updateDto.getCoverImage()); // Handling cover image URL update
+
 
         return userProfileRepository.save(profile);
     }
