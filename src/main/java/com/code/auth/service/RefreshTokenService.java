@@ -1,16 +1,13 @@
 package com.code.auth.service;
 
 import com.code.auth.entity.RefreshToken;
-import com.code.auth.entity.UserInfo;
 import com.code.auth.repo.RefreshTokenRepository;
 import com.code.auth.repo.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
@@ -19,17 +16,22 @@ public class RefreshTokenService {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    private UserInfoRepository userInfoRepository;
+    private UserInfoRepository userRepository;
+
+    @Autowired
+    private JwtService jwtService;
+    public void save(RefreshToken refreshToken) {
+        refreshTokenRepository.save(refreshToken);
+    }
+
 
     public RefreshToken createRefreshToken(String username) {
-        UserInfo userInfo = userInfoRepository.findByName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUserInfo(userRepository.findByName(username)
+                .orElseThrow(() -> new IllegalStateException("User not found with username: " + username)));
+        refreshToken.setToken(jwtService.generateRefreshToken(username));
+        refreshToken.setExpiryDate(Instant.now().plusMillis(86400000)); // 24 hours
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .userInfo(userInfo)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusMillis(86400000)) // 24 hours
-                .build();
         return refreshTokenRepository.save(refreshToken);
     }
 

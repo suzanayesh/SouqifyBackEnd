@@ -243,14 +243,11 @@ public class UserController {
       UserInfo userInfo = userInfoRepository.findByName(authRequest.getUsername())
               .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-      UserProfile userProfile = userProfileRepository.findByUser(userInfo)
-              .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
-
       RefreshToken refreshToken = refreshTokenService.createRefreshToken(userInfo.getName());
 
       Map<String, Object> response = new HashMap<>();
-      response.put("accessToken", token);
-      response.put("refreshToken", refreshToken.getToken());
+//      response.put("accessToken", token);
+      response.put("token", refreshToken.getToken());
       response.put("message", "Welcome " + userInfo.getName() + ", logged in successfully.");
       response.put("userId", userInfo.getId());
       response.put("username", userInfo.getName());
@@ -260,10 +257,8 @@ public class UserController {
       return ResponseEntity.ok(response);
 
     } catch (BadCredentialsException e) {
-      log.error("Authentication failed: Invalid username or password");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid username or password"));
     } catch (AuthenticationException e) {
-      log.error("Authentication failed: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Authentication failed"));
     }
   }
@@ -277,10 +272,10 @@ public class UserController {
               String accessToken = jwtService.generateToken(userInfo.getName());
               Map<String, Object> response = new HashMap<>();
               response.put("accessToken", accessToken);
-              response.put("refreshToken", refreshTokenRequestDTO.getToken());
               return ResponseEntity.ok(response);
             }).orElseThrow(() -> new RuntimeException("Refresh Token is not in DB..!!"));
   }
+
 
 
 
