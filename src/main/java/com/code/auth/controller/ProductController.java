@@ -7,12 +7,15 @@ import java.util.Map;
 
 import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Product;
+import com.code.auth.entity.UserInfo;
 import com.code.auth.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,22 +79,23 @@ public class ProductController {
 
     @PostMapping("supplier/addProduct")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
-    public ResponseEntity<Map<String, Object>> addProductToUser(@PathVariable Long userId, @RequestBody ProductDto productDto) {
+    public ResponseEntity<Map<String, Object>> addProductToUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProductDto productDto) {
+        Long userId = (long) ((UserInfo) userDetails).getId(); // This assumes you have a custom User class that extends UserDetails and has a getId() method.
         Product savedProduct = productService.addProductToUser(userId, productDto);
 
-        // Create a custom response JSON object
         Map<String, Object> response = new HashMap<>();
         response.put("productName", savedProduct.getProductName());
         response.put("description", savedProduct.getDescription());
         response.put("price", savedProduct.getPrice());
         response.put("stockQuantity", savedProduct.getStockQuantity());
         response.put("categoryId", savedProduct.getCategory().getCategoryId());
-        response.put("availableSizes", savedProduct.getAvailableSizes()); // Assumed to be JSON-parsed in service
-        response.put("availableColors", savedProduct.getAvailableColors()); // Assumed to be JSON-parsed in service
+        response.put("availableSizes", savedProduct.getAvailableSizes());
+        response.put("availableColors", savedProduct.getAvailableColors());
         response.put("brand", savedProduct.getBrand());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
 
 //    @GetMapping("/{id}")

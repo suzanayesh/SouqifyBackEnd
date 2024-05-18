@@ -1,4 +1,5 @@
 package com.code.auth.repo;
+import java.util.List;
 import java.util.Optional;
 
 import com.code.auth.entity.Cart;
@@ -11,5 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByCartAndProduct(Cart cart, Product product);
+    List<CartItem> findAllByCartId(Long cartId);
+
 }
 

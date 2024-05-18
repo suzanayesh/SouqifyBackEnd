@@ -2,6 +2,7 @@ package com.code.auth.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -52,9 +53,19 @@ public class Cart {
 
 
     public void addCartItem(CartItem cartItem) {
-        cartItems.add(cartItem);
-        cartItem.setCart(this);
+        if (cartItems == null) {
+            cartItems = new ArrayList<>();
+        }
+        if (!cartItems.contains(cartItem)) {
+            cartItems.add(cartItem);
+            cartItem.setCart(this);
+        }
     }
+
+//    public void addCartItem(CartItem cartItem) {
+//        cartItems.add(cartItem);
+//        cartItem.setCart(this);
+//    }
 
     public void removeCartItem(CartItem cartItem) {
         cartItems.remove(cartItem);
