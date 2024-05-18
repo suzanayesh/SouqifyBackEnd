@@ -1,12 +1,11 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.AuthRequest;
+import com.code.auth.dto.user.JwtResponseDTO;
+import com.code.auth.dto.user.RefreshTokenRequestDTO;
 import com.code.auth.dto.user.SimpleUserInfo;
 import com.code.auth.dto.user.UserDto;
-import com.code.auth.entity.Cart;
-import com.code.auth.entity.Role;
-import com.code.auth.entity.UserInfo;
-import com.code.auth.entity.UserProfile;
+import com.code.auth.entity.*;
 import com.code.auth.exception.EmailExistsException;
 import com.code.auth.exception.ErrorResponse;
 import com.code.auth.exception.ResourceNotFoundException;
@@ -16,6 +15,7 @@ import com.code.auth.lookup.Response;
 import com.code.auth.repo.UserInfoRepository;
 import com.code.auth.repo.UserProfileRepository;
 import com.code.auth.service.JwtService;
+import com.code.auth.service.RefreshTokenService;
 import com.code.auth.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -226,6 +226,8 @@ public class UserController {
     }
   }
 
+  @Autowired
+  private RefreshTokenService refreshTokenService;
   @PostMapping("/login")
   public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
     try {
@@ -244,14 +246,16 @@ public class UserController {
       UserProfile userProfile = userProfileRepository.findByUser(userInfo)
               .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
+      RefreshToken refreshToken = refreshTokenService.createRefreshToken(userInfo.getName());
 
       Map<String, Object> response = new HashMap<>();
-      response.put("token", token);
+      response.put("accessToken", token);
+      response.put("refreshToken", refreshToken.getToken());
       response.put("message", "Welcome " + userInfo.getName() + ", logged in successfully.");
       response.put("userId", userInfo.getId());
       response.put("username", userInfo.getName());
       response.put("roleId", userInfo.getRole().getId()); // Assuming Role is a direct field in UserInfo
-      response.put("email", userInfo.getEmail() );  // Assuming the email is not null
+      response.put("email", userInfo.getEmail());  // Assuming the email is not null
 
       return ResponseEntity.ok(response);
 
@@ -262,6 +266,20 @@ public class UserController {
       log.error("Authentication failed: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Authentication failed"));
     }
+  }
+
+  @PostMapping("/refreshToken")
+  public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
+    return refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
+            .map(refreshTokenService::verifyExpiration)
+            .map(RefreshToken::getUserInfo)
+            .map(userInfo -> {
+              String accessToken = jwtService.generateToken(userInfo.getName());
+              Map<String, Object> response = new HashMap<>();
+              response.put("accessToken", accessToken);
+              response.put("refreshToken", refreshTokenRequestDTO.getToken());
+              return ResponseEntity.ok(response);
+            }).orElseThrow(() -> new RuntimeException("Refresh Token is not in DB..!!"));
   }
 
 
