@@ -1,10 +1,7 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.AuthRequest;
-import com.code.auth.dto.user.JwtResponseDTO;
-import com.code.auth.dto.user.RefreshTokenRequestDTO;
-import com.code.auth.dto.user.SimpleUserInfo;
-import com.code.auth.dto.user.UserDto;
+import com.code.auth.dto.user.*;
 import com.code.auth.entity.*;
 import com.code.auth.exception.EmailExistsException;
 import com.code.auth.exception.ErrorResponse;
@@ -315,7 +312,13 @@ public class UserController {
 //  }
 
 
-
+  @Autowired
+  private UserInfoService userInfoService;
+  @GetMapping("/suppliers")
+  public ResponseEntity<List<SupplierResponseDto>> getAllSuppliers() {
+    List<SupplierResponseDto> suppliers = userInfoService.getAllSuppliers();
+    return ResponseEntity.ok(suppliers);
+  }
 
 
 

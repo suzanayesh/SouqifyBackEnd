@@ -1,6 +1,7 @@
 package com.code.auth.service;
 
 import com.code.auth.dto.user.SimpleUserInfo;
+import com.code.auth.dto.user.SupplierResponseDto;
 import com.code.auth.dto.user.UserDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
@@ -160,6 +161,34 @@ public class UserInfoService implements UserDetailsService {
 
         return savedUser;
     }
+//    public List<SupplierResponseDto> getAllSuppliers() {
+//        return userInfoRepository.findByRoleId(2).stream()
+//                .map(this::convertToSupplierResponseDto)
+//                .collect(Collectors.toList());
+//    }
+public List<SupplierResponseDto> getAllSuppliers() {
+    List<UserInfo> suppliers = userInfoRepository.findByRoleId(2); // Assuming role ID 2 is for suppliers
+    return suppliers.stream()
+            .filter(userInfo -> userInfo.getUserProfile() != null) // Filter out suppliers without UserProfile
+            .map(this::convertToSupplierResponseDto)
+            .collect(Collectors.toList());
+}
+
+    private SupplierResponseDto convertToSupplierResponseDto(UserInfo userInfo) {
+        SupplierResponseDto dto = new SupplierResponseDto();
+        dto.setUserId((long) userInfo.getId());
+        if (userInfo.getUserProfile() != null) {
+            dto.setProfileImage(userInfo.getUserProfile().getProfileImage());
+            dto.setLocation(userInfo.getUserProfile().getLocation());
+        } else {
+            dto.setProfileImage(null);
+            dto.setLocation(null);
+        }
+        dto.setRoleId(userInfo.getRole().getId());
+        dto.setUsername(userInfo.getName());
+        return dto;
+    }
+
 
     public List<SimpleUserInfo> findUsersByNameContaining(String name) {
         return userInfoRepository.findByNameContaining(name)

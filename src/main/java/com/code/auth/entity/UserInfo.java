@@ -22,5 +22,8 @@ public class UserInfo {
 
   @Column(name = "profile_image")
   private String profileImage;
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+  private UserProfile userProfile;
+
 
 }

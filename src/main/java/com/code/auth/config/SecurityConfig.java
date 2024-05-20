@@ -42,7 +42,7 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .requestMatchers("/auth/welcome","/auth/refreshToken", "/auth/signup", "/auth/login", "/auth/search/{name}","/profiles/**","users/search/**","/categories/getAll").permitAll()
             .and()
-            .authorizeHttpRequests().requestMatchers("/auth/user/**","/userProfile/**").authenticated()
+            .authorizeHttpRequests().requestMatchers("/auth/user/**","/userProfile/**","/auth/suppliers").authenticated()
             .and()
             .authorizeHttpRequests().requestMatchers("/auth/admin/**","/categories/**").authenticated()
             .and()
