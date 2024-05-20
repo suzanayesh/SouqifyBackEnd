@@ -1,6 +1,5 @@
 package com.code.auth.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,4 +30,3 @@ public class Rating {
     @Column(name = "comment")
     private String comment;
 }
-

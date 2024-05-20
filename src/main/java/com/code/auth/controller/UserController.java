@@ -239,20 +239,22 @@ public class UserController {
         throw new BadCredentialsException("Invalid username or password");
       }
 
-      String token = jwtService.generateToken(authRequest.getUsername());
       UserInfo userInfo = userInfoRepository.findByName(authRequest.getUsername())
               .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-      RefreshToken refreshToken = refreshTokenService.createRefreshToken(userInfo.getName());
+      UserProfile userProfile = userProfileRepository.findByUser(userInfo)
+              .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+
+      String accessToken = jwtService.generateToken(authRequest.getUsername());
+      String refreshToken = jwtService.generateRefreshToken(authRequest.getUsername());
 
       Map<String, Object> response = new HashMap<>();
-//      response.put("accessToken", token);
-      response.put("token", refreshToken.getToken());
+      response.put("token", accessToken);
       response.put("message", "Welcome " + userInfo.getName() + ", logged in successfully.");
       response.put("userId", userInfo.getId());
       response.put("username", userInfo.getName());
-      response.put("roleId", userInfo.getRole().getId()); // Assuming Role is a direct field in UserInfo
-      response.put("email", userInfo.getEmail());  // Assuming the email is not null
+      response.put("roleId", userInfo.getRole().getId());
+      response.put("email", userInfo.getEmail());
 
       return ResponseEntity.ok(response);
 
@@ -262,7 +264,6 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Authentication failed"));
     }
   }
-
   @PostMapping("/refreshToken")
   public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
     return refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
