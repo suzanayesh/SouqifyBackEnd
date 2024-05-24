@@ -47,18 +47,19 @@ public class UserProfile {
     @Column(name = "social_media_instagram")
     private String socialMediaInstagram;
 
-    @Column(name = "comment")  // New field for additional comments
+    @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Rating> ratings;
+    @Column(name = "profile_image", nullable = true)
+    private String profileImage;  // URL to the profile image
+    @Column(name = "comment")
     private String comment;
+
     @Column(name = "rating", nullable = true)
     @Min(1) @Max(5)
     private Integer rating;
-    @Column(name = "profile_image", nullable = true)
-    private String profileImage;  // URL to the profile image
-
     @Column(name = "cover_image", nullable = true)
     private String coverImage;  // URL to the cover image
-    @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Rating> ratings;
+
     @PrePersist
     @PreUpdate
     private void loadUsernameFromUser() {

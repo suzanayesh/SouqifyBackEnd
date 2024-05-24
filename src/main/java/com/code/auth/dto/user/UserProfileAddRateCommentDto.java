@@ -1,6 +1,5 @@
 package com.code.auth.dto.user;
 
-
 import lombok.Data;
 
 @Data

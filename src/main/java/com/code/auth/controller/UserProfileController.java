@@ -2,21 +2,26 @@ package com.code.auth.controller;
 
 import com.code.auth.dto.user.UserProfileAddRateCommentDto;
 import com.code.auth.dto.user.UserProfileUpdateDto;
+import com.code.auth.entity.Rating;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.entity.UserProfile;
 import com.code.auth.exception.ErrorResponse;
 import com.code.auth.exception.ResourceNotFoundException;
 import com.code.auth.repo.UserInfoRepository;
 import com.code.auth.repo.UserProfileRepository;
+import com.code.auth.service.RatingService;
 import com.code.auth.service.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +47,29 @@ public class UserProfileController {
             // General exception handler for any other unexpected errors
             return ResponseEntity.internalServerError().body(new ApiResponse(false, "Failed to update profile. Try again.", null));
         }
+    }
+    @Autowired
+    private RatingService ratingService;
+    @PostMapping("/rate")
+    public ResponseEntity<?> addRating(@RequestBody UserProfileAddRateCommentDto dto, @AuthenticationPrincipal UserDetails userDetails) {
+        Rating rating = ratingService.addRating(dto, userDetails.getUsername());
+        return ResponseEntity.ok(Map.of(
+                "userProfile", rating.getUserProfile().getUsername(),
+                "rating", rating.getRating(),
+                "comment", rating.getComment()
+        ));
+    }
+
+    @GetMapping("/ratings")
+    public ResponseEntity<?> getRatingsForUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = (long) ((UserInfo) userDetails).getId();
+        List<Rating> ratings = ratingService.getRatingsForUserProfile(userId);
+        List<Map<String, ? extends Serializable>> response = ratings.stream().map(rating -> Map.of(
+                "username", rating.getRater().getName(),
+                "rating", rating.getRating(),
+                "comment", rating.getComment()
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
 //    @PostMapping("/addrateComment")
