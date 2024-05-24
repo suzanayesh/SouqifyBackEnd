@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Entity
 @Table(name = "products1")
@@ -61,11 +62,11 @@ public class Product {
     }
 
     public List<String> getAvailableSizes() {
-        return fromJson(this.sizesJson, List.class);
+        return fromJson(this.sizesJson, new TypeReference<List<String>>() {});
     }
 
     public List<String> getAvailableColors() {
-        return fromJson(this.colorsJson, List.class);
+        return fromJson(this.colorsJson, new TypeReference<List<String>>() {});
     }
 
     private static String toJson(Object obj) {
@@ -76,9 +77,9 @@ public class Product {
         }
     }
 
-    private static <T> T fromJson(String json, Class<T> clazz) {
+    private static <T> T fromJson(String json, TypeReference<T> typeReference) {
         try {
-            return new ObjectMapper().readValue(json, clazz);
+            return new ObjectMapper().readValue(json, typeReference);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error in JSON reading", e);
         }
