@@ -69,7 +69,6 @@ public class UserProfileService {
         UserProfile profile = userProfileRepository.findById((long) userInfo.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("UserProfile not found for user: " + currentUsername));
 
-        // Update the UserProfile details
         profile.setLocation(updateDto.getLocation());
         profile.setStoreWebLink(updateDto.getStoreWebLink());
         profile.setPhoneNumber(updateDto.getPhoneNumber());
