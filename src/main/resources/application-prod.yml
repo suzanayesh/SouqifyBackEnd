@@ -13,13 +13,17 @@
 #      hibernate:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
 #
-#server:
-#  port: 8080
+#  server:
+#    port: 8080
 #
-#logging:
-#  level:
-#    org:
-#      springframework:
-#        transaction: DEBUG
-#        security: DEBUG
-#    root: INFO
+#  logging:
+#    level:
+#      org:
+#        springframework:
+#          transaction: DEBUG
+#          security: DEBUG
+#      root: INFO
+#
+#  sql:
+#    init:
+#      mode: always # you won't do this in prod, I'm just doing this for demo purposes
