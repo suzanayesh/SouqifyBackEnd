@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/userProfile")
-public class UserProfileController {
+    public class UserProfileController {
 
     @Autowired
     private UserProfileService userProfileService;
@@ -60,17 +60,17 @@ public class UserProfileController {
         ));
     }
 
-    @GetMapping("/ratings")
-    public ResponseEntity<?> getRatingsForUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = (long) ((UserInfo) userDetails).getId();
-        List<Rating> ratings = ratingService.getRatingsForUserProfile(userId);
-        List<Map<String, ? extends Serializable>> response = ratings.stream().map(rating -> Map.of(
-                "username", rating.getRater().getName(),
-                "rating", rating.getRating(),
-                "comment", rating.getComment()
-        )).collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
+//    @GetMapping("/ratings")
+//    public ResponseEntity<?> getRatingsForUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+//        Long userId = (long) ((UserInfo) userDetails).getId();
+//        List<Rating> ratings = ratingService.getRatingsForUserProfile(userId);
+//        List<Map<String, ? extends Serializable>> response = ratings.stream().map(rating -> Map.of(
+//                "username", rating.getRater().getName(),
+//                "rating", rating.getRating(),
+//                "comment", rating.getComment()
+//        )).collect(Collectors.toList());
+//        return ResponseEntity.ok(response);
+//    }
 
 //    @PostMapping("/addrateComment")
 //    public ResponseEntity<?> addRateAndComment(@RequestBody UserProfileAddRateCommentDto rateCommentDto) {

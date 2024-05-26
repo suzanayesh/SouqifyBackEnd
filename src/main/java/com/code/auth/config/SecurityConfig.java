@@ -44,7 +44,7 @@ public class SecurityConfig {
             .cors().configurationSource(corsConfigurationSource()).and()
             .csrf().disable()
             .authorizeHttpRequests()
-            .requestMatchers("/auth/welcome","/auth/refreshToken", "/auth/signup", "/auth/login", "/auth/search/{name}","/profiles/**","users/search/**","/categories/getAll", "/ws/chat/**", "/socket.io/**").permitAll()
+            .requestMatchers("/userProfile/ratings","/auth/welcome","/auth/refreshToken", "/auth/signup", "/auth/login", "/auth/search/{name}","/profiles/**","users/search/**","/categories/getAll", "/ws/chat/**", "/socket.io/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement()
