@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @Entity
-@Table(name = "products1")
+@Table(name = "products")
 @Data
 public class Product {
 

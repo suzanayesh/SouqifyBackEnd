@@ -1,4 +1,5 @@
 package com.code.auth.config;
+
 import com.code.auth.entity.UserInfo;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,24 +11,23 @@ import java.util.stream.Collectors;
 
 public class UserInfoDetails implements UserDetails {
 
+  private UserInfo userInfo;  // Add a reference to UserInfo
   private String name;
   private String password;
-
-  private int id;
   private List<GrantedAuthority> authorities;
 
   public UserInfoDetails(UserInfo userInfo) {
-    name = userInfo.getName();
-    password = userInfo.getPassword();
-    id = userInfo.getId();
-//    authorities = Arrays.stream(userInfo.getRoles().split(","))
-//      .map(SimpleGrantedAuthority::new)
-//      .collect(Collectors.toList());
+    this.userInfo = userInfo;  // Store the entire UserInfo object
+    this.name = userInfo.getName();
+    this.password = userInfo.getPassword();
+    this.authorities = userInfo.getRole().getPermissions().stream()
+            .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+            .collect(Collectors.toList());
+  }
 
-    authorities = userInfo.getRole().getPermissions().stream()
-      .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-      .collect(Collectors.toList());
-    //functional programming
+  // Getter for UserInfo
+  public UserInfo getUserInfo() {
+    return this.userInfo;
   }
 
   @Override
@@ -63,9 +63,5 @@ public class UserInfoDetails implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
-  }
-
-  public int getId() {
-    return this.id;
   }
 }
