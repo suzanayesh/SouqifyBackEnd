@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.code.auth.config.UserInfoDetails;
 import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Product;
 import com.code.auth.entity.UserInfo;
@@ -80,7 +81,7 @@ public class ProductController {
     @PostMapping("supplier/addProduct")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
     public ResponseEntity<Map<String, Object>> addProductToUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProductDto productDto) {
-        Long userId = (long) ((UserInfo) userDetails).getId(); // This assumes you have a custom User class that extends UserDetails and has a getId() method.
+        Long userId = (long) ((UserInfoDetails) userDetails).getId(); // This assumes you have a custom User class that extends UserDetails and has a getId() method.
         Product savedProduct = productService.addProductToUser(userId, productDto);
 
         Map<String, Object> response = new HashMap<>();
