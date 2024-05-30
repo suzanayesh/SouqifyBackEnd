@@ -50,12 +50,7 @@ public class ProductService {
     }
 
     public List<Product> findAllByCategoryId(Long id){
-        List<Product> result = new ArrayList<>();
-        if(categoryRepository.findById(id).isPresent()){
-            Category category = categoryRepository.findById(id).get();
-            result = productRepository.findAllByCategory(category);
-        }
-        return result;
+        return productRepository.findAllByCategoryId(id);
     }
 
     public List<Product> findAllProductsByUser(Long userId) {
