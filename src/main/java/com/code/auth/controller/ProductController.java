@@ -44,8 +44,10 @@ public class ProductController {
         Product savedProduct = productService.addProductToUser(userId, productDto);
 
         Map<String, Object> response = new HashMap<>();
+
         response.put("productName", savedProduct.getProductName());
         response.put("description", savedProduct.getDescription());
+        response.put("modelNumber", savedProduct.getModelNumber());
         response.put("price", savedProduct.getPrice());
         response.put("stockQuantity", savedProduct.getStockQuantity());
         response.put("categoryId", savedProduct.getCategory().getCategoryId());

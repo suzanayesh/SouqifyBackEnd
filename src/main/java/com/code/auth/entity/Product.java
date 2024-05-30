@@ -15,12 +15,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 @Data
 public class Product {
 
+
+    //model number
+    //number of pieces
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String productName;
+
+    @Column(nullable = false)
+    private  Long modelNumber;
 
     @Column(nullable = false)
     private Double price;
