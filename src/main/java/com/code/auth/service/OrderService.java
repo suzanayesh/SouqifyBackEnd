@@ -5,11 +5,10 @@ import com.code.auth.dto.user.OrderItemDTO;
 import com.code.auth.dto.user.OrderResponseDTO;
 import com.code.auth.entity.Order;
 import com.code.auth.entity.OrderItem;
+import com.code.auth.exception.OrderNotFoundException;
 import com.code.auth.repo.OrderItemRepository;
 import com.code.auth.repo.OrderRepository;
-import com.code.auth.exception.OrderNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -36,6 +35,12 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
         order.setStatus(orderStatus);
         order = orderRepository.save(order);
+        return convertToDTO(order);
+    }
+
+    public OrderDTO getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
         return convertToDTO(order);
     }
 

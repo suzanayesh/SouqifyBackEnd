@@ -66,4 +66,9 @@ public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser(@PathVariable 
         OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, statusUpdateDTO.getOrderStatus(), userDetails);
         return ResponseEntity.ok(updatedOrder);
     }
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
+        OrderDTO orderDTO = orderService.getOrderById(orderId);
+        return ResponseEntity.ok(orderDTO);
+    }
 }
