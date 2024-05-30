@@ -7,8 +7,11 @@ import com.code.auth.entity.Order;
 import com.code.auth.entity.OrderItem;
 import com.code.auth.repo.OrderItemRepository;
 import com.code.auth.repo.OrderRepository;
+import com.code.auth.exception.OrderNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +31,19 @@ public class OrderService {
         return convertToDTO(order);
     }
 
+    public OrderDTO updateOrderStatus(Long orderId, String orderStatus, UserDetails userDetails) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+        order.setStatus(orderStatus);
+        order = orderRepository.save(order);
+        return convertToDTO(order);
+    }
+
+    public List<OrderResponseDTO> getAllOrdersForUser(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return orders.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    }
+
     private OrderDTO convertToDTO(Order order) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(order.getId());
@@ -45,6 +61,14 @@ public class OrderService {
         return orderDTO;
     }
 
+    private OrderResponseDTO convertToResponseDTO(Order order) {
+        OrderResponseDTO dto = new OrderResponseDTO();
+        dto.setOrderStatus(order.getStatus());
+        dto.setOrderDate(order.getOrderDate().toString());
+        dto.setOrderName(order.getOrderName());
+        return dto;
+    }
+
     private Order convertToEntity(OrderDTO orderDTO) {
         Order order = new Order();
         order.setOrderDate(orderDTO.getOrderDate());
@@ -60,18 +84,5 @@ public class OrderService {
             return orderItem;
         }).collect(Collectors.toList()));
         return order;
-    }
-
-    public List<OrderResponseDTO> getAllOrdersForUser(Long userId) {
-        List<Order> orders = orderRepository.findByUserId(userId);
-        return orders.stream().map(this::convertToOrderResponseDTO).collect(Collectors.toList());
-    }
-
-    private OrderResponseDTO convertToOrderResponseDTO(Order order) {
-        OrderResponseDTO dto = new OrderResponseDTO();
-        dto.setOrderStatus(order.getStatus());
-        dto.setOrderDate(order.getOrderDate().toString()); // Assuming orderDate is of type Date or similar
-        dto.setOrderName(order.getOrderName());
-        return dto;
     }
 }
