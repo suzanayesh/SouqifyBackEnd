@@ -26,4 +26,5 @@ public class UserInfo {
   private UserProfile userProfile;
 
 
+
 }
