@@ -1,6 +1,8 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.user.OrderDTO;
+import com.code.auth.dto.user.OrderResponseDTO;
+import com.code.auth.entity.Order;
 import com.code.auth.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -46,4 +49,14 @@ public class OrderController {
 
         return ResponseEntity.ok(response);
     }
+//    @GetMapping("/{orderId}")
+//    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
+//        OrderDTO orderDTO = orderService.getOrderById(orderId);
+//        return ResponseEntity.ok(orderDTO);
+//    }
+@GetMapping("/user/{userId}")
+public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser(@PathVariable Long userId) {
+    List<OrderResponseDTO> orders = orderService.getAllOrdersForUser(userId);
+    return ResponseEntity.ok(orders);
+}
 }

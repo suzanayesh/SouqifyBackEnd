@@ -1,9 +1,8 @@
 package com.code.auth.service;
 
-
-
 import com.code.auth.dto.user.OrderDTO;
 import com.code.auth.dto.user.OrderItemDTO;
+import com.code.auth.dto.user.OrderResponseDTO;
 import com.code.auth.entity.Order;
 import com.code.auth.entity.OrderItem;
 import com.code.auth.repo.OrderItemRepository;
@@ -11,6 +10,7 @@ import com.code.auth.repo.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,5 +60,18 @@ public class OrderService {
             return orderItem;
         }).collect(Collectors.toList()));
         return order;
+    }
+
+    public List<OrderResponseDTO> getAllOrdersForUser(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return orders.stream().map(this::convertToOrderResponseDTO).collect(Collectors.toList());
+    }
+
+    private OrderResponseDTO convertToOrderResponseDTO(Order order) {
+        OrderResponseDTO dto = new OrderResponseDTO();
+        dto.setOrderStatus(order.getStatus());
+        dto.setOrderDate(order.getOrderDate().toString()); // Assuming orderDate is of type Date or similar
+        dto.setOrderName(order.getOrderName());
+        return dto;
     }
 }
