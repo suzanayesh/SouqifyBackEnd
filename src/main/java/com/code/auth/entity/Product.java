@@ -25,6 +25,9 @@ public class Product {
     private String productName;
 
     @Column(nullable = false)
+    private  Long modelNumber;
+
+    @Column(nullable = false)
     private Double price;
 
     @Column(length = 1024)

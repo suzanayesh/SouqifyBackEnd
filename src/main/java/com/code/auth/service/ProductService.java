@@ -39,6 +39,8 @@ public class ProductService {
         product.setProductName(productDto.getProductName());
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
+        product.setModelNumber(productDto.getModelNumber());
+
         product.setBrand(productDto.getBrand());
         product.setStockQuantity(productDto.getStockQuantity());
         product.setAvailableSizes(productDto.getAvailableSizes());
@@ -73,6 +75,8 @@ public class ProductService {
 
         product.setProductName(productDetails.getProductName());
         product.setDescription(productDetails.getDescription());
+        product.setModelNumber(productDetails.getModelNumber());
+
         product.setPrice(productDetails.getPrice());
         product.setStockQuantity(productDetails.getStockQuantity());
         product.setBrand(productDetails.getBrand());
@@ -93,6 +97,7 @@ public class ProductService {
                 .stream()
                 .map(product -> new ProductDto(
                         product.getId(),
+                        product.getModelNumber(),
                         product.getProductName(),
                         product.getDescription(),
                         product.getPrice(),
