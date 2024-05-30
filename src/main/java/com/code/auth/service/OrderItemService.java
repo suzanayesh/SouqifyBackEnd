@@ -31,7 +31,7 @@ public class OrderItemService {
 
     private OrderItemDTO convertToOrderItemDTO(OrderItem orderItem) {
         OrderItemDTO dto = new OrderItemDTO();
-        dto.setProductId(orderItem.getProduct().getId());
+        dto.setProductId(orderItem.getProductId());
 // Assuming Product is eagerly loaded or handled to prevent LazyInitializationException
         dto.setQuantity(orderItem.getQuantity());
         dto.setPricePerUnit(orderItem.getPricePerUnit());

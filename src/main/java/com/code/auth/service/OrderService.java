@@ -1,16 +1,16 @@
 package com.code.auth.service;
 
+
+
 import com.code.auth.dto.user.OrderDTO;
-import com.code.auth.entity.*;
+import com.code.auth.dto.user.OrderItemDTO;
+import com.code.auth.entity.Order;
+import com.code.auth.entity.OrderItem;
+import com.code.auth.repo.OrderItemRepository;
 import com.code.auth.repo.OrderRepository;
-import com.code.auth.repo.ProductRepository;
-import com.code.auth.repo.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,37 +20,45 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     @Autowired
-    private UserInfoRepository userInfoRepository;
+    private OrderItemRepository orderItemRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    public OrderDTO createOrder(OrderDTO orderDTO) {
+        Order order = convertToEntity(orderDTO);
+        order = orderRepository.save(order);
+        return convertToDTO(order);
+    }
 
-    @Transactional
-    public Order createOrder(OrderDTO orderDTO) {
-        UserInfo user = userInfoRepository.findById(orderDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    private OrderDTO convertToDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(order.getId());
+        orderDTO.setOrderDate(order.getOrderDate());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setOrderName(order.getOrderName());
+        orderDTO.setUserId(order.getUserId());
+        orderDTO.setOrderItems(order.getOrderItems().stream().map(orderItem -> {
+            OrderItemDTO orderItemDTO = new OrderItemDTO();
+            orderItemDTO.setProductId(orderItem.getProductId());
+            orderItemDTO.setQuantity(orderItem.getQuantity());
+            orderItemDTO.setPricePerUnit(orderItem.getPricePerUnit());
+            return orderItemDTO;
+        }).collect(Collectors.toList()));
+        return orderDTO;
+    }
 
+    private Order convertToEntity(OrderDTO orderDTO) {
         Order order = new Order();
-        order.setUser(user);
         order.setOrderDate(orderDTO.getOrderDate());
-        order.setStatus(OrderStatus.valueOf(orderDTO.getStatus()));
-        order.setTotalPrice(orderDTO.getTotalPrice());
-
-        List<OrderItem> orderItems = orderDTO.getOrderItems().stream().map(itemDTO -> {
-            Product product = productRepository.findById(itemDTO.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-
+        order.setStatus(orderDTO.getStatus());
+        order.setOrderName(orderDTO.getOrderName());
+        order.setUserId(orderDTO.getUserId());
+        order.setOrderItems(orderDTO.getOrderItems().stream().map(orderItemDTO -> {
             OrderItem orderItem = new OrderItem();
+            orderItem.setProductId(orderItemDTO.getProductId());
+            orderItem.setQuantity(orderItemDTO.getQuantity());
+            orderItem.setPricePerUnit(orderItemDTO.getPricePerUnit());
             orderItem.setOrder(order);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(itemDTO.getQuantity());
-            orderItem.setPricePerUnit(itemDTO.getPricePerUnit());
-
             return orderItem;
-        }).collect(Collectors.toList());
-
-        order.setOrderItems((Set<OrderItem>) orderItems);
-
-        return orderRepository.save(order);
+        }).collect(Collectors.toList()));
+        return order;
     }
 }

@@ -1,6 +1,7 @@
 package com.code.auth.dto.user;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -11,10 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDTO {
-    private Long userId;
+    private Long id;
     private LocalDateTime orderDate;
     private String status;
-    private Double totalPrice;
-    private List<OrderItemDTO> orderItems;
+    private String orderName;
+    private Long userId;
+    private List<OrderItemDTO> orderItems = new ArrayList<>();
 
 }
