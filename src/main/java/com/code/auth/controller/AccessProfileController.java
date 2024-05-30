@@ -1,11 +1,9 @@
 package com.code.auth.controller;
 
-import com.code.auth.dto.user.UserProfileAddRateCommentDto;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.entity.UserProfile;
 import com.code.auth.exception.ResourceNotFoundException;
 import com.code.auth.repo.UserInfoRepository;
-import com.code.auth.repo.UserProfileRepository;
 import com.code.auth.service.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/profiles")
-public class AccessProfile {
+public class AccessProfileController {
     @Autowired
     private UserInfoRepository userInfoRepository;
 
