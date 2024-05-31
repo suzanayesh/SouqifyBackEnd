@@ -2,12 +2,12 @@ package com.code.auth.service;
 
 import com.code.auth.dto.user.FollowDto;
 import com.code.auth.entity.Follow;
+import com.code.auth.entity.Role;
 import com.code.auth.entity.UserProfile;
-import com.code.auth.repo.FollowRepository;
 import com.code.auth.repo.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.code.auth.repo.FollowRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +20,9 @@ public class FollowService {
 
     @Autowired
     private UserProfileRepository userProfileRepository;
+
+    @Autowired
+    private UserInfoService userInfoService;
 
     public FollowDto follow(Long retailerId, Long supplierId) {
         UserProfile retailer = userProfileRepository.findById(retailerId)
@@ -56,6 +59,14 @@ public class FollowService {
         followDto.setFollowerId(follow.getFollower().getProfileId());
         followDto.setFolloweeId(follow.getFollowee().getProfileId());
         followDto.setFollowedAt(follow.getFollowedAt());
+        Role role = userInfoService.getCurrentUserInfo().getRole();
+        if(role.getId() == 3 ){
+            followDto.setUsername(follow.getFollower().getUsername());
+            followDto.setProfilePic(follow.getFollower().getProfileImage());
+        }else{
+            followDto.setUsername(follow.getFollowee().getUsername());
+            followDto.setProfilePic(follow.getFollowee().getProfileImage());
+        }
         return followDto;
     }
 }

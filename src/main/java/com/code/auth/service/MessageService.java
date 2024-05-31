@@ -36,7 +36,6 @@ public class MessageService {
     }
 
     public void initiateChat(String fromUser, String toUser) {
-        // Optional: Add logic to check if the chat already exists or any other business logic
         saveMessage(fromUser, toUser, ""); // Save an initial empty message to start the chat
     }
 }

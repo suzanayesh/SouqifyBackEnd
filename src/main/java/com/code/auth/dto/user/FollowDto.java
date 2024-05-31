@@ -8,6 +8,10 @@ public class FollowDto {
     private Long followeeId;
     private LocalDateTime followedAt;
 
+    private String username;
+
+    private String profilePic;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -39,5 +43,21 @@ public class FollowDto {
 
     public void setFollowedAt(LocalDateTime followedAt) {
         this.followedAt = followedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 }
