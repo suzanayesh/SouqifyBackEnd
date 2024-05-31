@@ -115,9 +115,9 @@ public class CartItemController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-    @PostMapping("/add/{cartId}")
-    public ResponseEntity<CartItem> addCartItemToCart(@PathVariable Long cartId, @RequestBody CartItemDTO cartItemRequest) {
-        CartItem cartItem = cartItemService.addCartItemToCart(cartId, cartItemRequest.getProductId(), cartItemRequest.getQuantity(), cartItemRequest.getPrice(), cartItemRequest.getProductName(),cartItemRequest.getTotal(),cartItemRequest.getColor());
+    @PostMapping("/add")
+    public ResponseEntity<CartItem> addCartItemToCart(@RequestBody CartItemDTO cartItemRequest) {
+        CartItem cartItem = cartItemService.addCartItemToCart(cartItemRequest);
         return ResponseEntity.ok(cartItem);
     }
 
@@ -133,7 +133,7 @@ public class CartItemController {
 //    }
     @PutMapping("/{id}")
     public ResponseEntity<CartItem> updateCartItem(@PathVariable Long id, @RequestBody CartItem updatedCartItem) {
-        CartItem cartItem = cartItemService.updateCartItem(id, updatedCartItem.getQuantity(), updatedCartItem.getPrice());
+        CartItem cartItem = cartItemService.updateCartItem(id, updatedCartItem.getQuantity(), updatedCartItem.getColors(),updatedCartItem.getSizes());
         return ResponseEntity.ok(cartItem);
     }
     @DeleteMapping("/{id}")

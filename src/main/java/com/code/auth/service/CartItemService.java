@@ -127,10 +127,13 @@ public class CartItemService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
-    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository, ProductRepository productRepository) {
+    private final UserInfoService userInfoService;
+
+    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository, ProductRepository productRepository, UserInfoService userInfoService) {
         this.cartItemRepository = cartItemRepository;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
+        this.userInfoService = userInfoService;
     }
 
     public List<CartItem> findAllCartItems() {
@@ -155,14 +158,14 @@ public class CartItemService {
 //        return cartItemRepository.save(cartItem);
 //    }
     @Transactional
-    public CartItem updateCartItem(Long id, int quantity, double price) {
+    public CartItem updateCartItem(Long id, int quantity, List<String> colors, List<String> sizes) {
         CartItem cartItem = cartItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("CartItem not found with id: " + id));
 
         cartItem.setQuantity(quantity);
-        cartItem.setPrice(price);
-        cartItem.setTotal(quantity * price);  // Assuming you want to update the total price as well
-
+        cartItem.setTotal(quantity * cartItem.getProduct().getPrice());  // Assuming you want to update the total price as well
+        cartItem.setColors(colors);
+        cartItem.setSizes(sizes);
         return cartItemRepository.save(cartItem);
     }
     public void deleteCartItem(Long id) {
@@ -177,28 +180,23 @@ public class CartItemService {
 
     //the new one goes here 23.05
 
-    public CartItem addCartItemToCart(Long cartId, Long productId, int quantity, double price, String productName, double total, Color color) {
-        Optional<Cart> optionalCart = cartRepository.findById(cartId);
-        if (!optionalCart.isPresent()) {
-            throw new RuntimeException("Cart not found with id: " + cartId);
-        }
+    public CartItem addCartItemToCart(CartItemDTO cartItemDTO) {
+        Cart cart = cartRepository.findByUserId(userInfoService.getCurrentUserInfo().getId());
 
-        Optional<Product> optionalProduct = productRepository.findById(productId);
+        Optional<Product> optionalProduct = productRepository.findById(cartItemDTO.getProductId());
         if (!optionalProduct.isPresent()) {
-            throw new RuntimeException("Product not found with id: " + productId);
+            throw new RuntimeException("Product not found with id: " + cartItemDTO.getProductId());
         }
 
-        Cart cart = optionalCart.get();
         Product product = optionalProduct.get();
 
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
         cartItem.setProduct(product);
-        cartItem.setQuantity(quantity);
-        cartItem.setPrice(price);
-        cartItem.setProductName(productName);
-        cartItem.setTotal(total);
-        cartItem.setColor(color);
+        cartItem.setQuantity(cartItemDTO.getQuantity());
+        cartItem.setTotal((cartItemDTO.getQuantity() * product.getPrice()));
+        cartItem.setColors(cartItemDTO.getColors());
+        cartItem.setSizes(cartItemDTO.getSizes());
 
         cartItemRepository.save(cartItem);
         return cartItem;
@@ -229,14 +227,14 @@ public class CartItemService {
 //
 //        return cartItemRepository.save(cartItem);
 //    }
-    public CartItemDTO convertToCartItemDTO(CartItem cartItem) {
-        CartItemDTO dto = new CartItemDTO();
-        dto.setProductId(cartItem.getProduct().getId());
-        dto.setProductName(cartItem.getProductName());
-        dto.setQuantity(cartItem.getQuantity());
-        dto.setPrice(cartItem.getPrice());
-        dto.setColor(cartItem.getColor());
-        dto.setTotal(cartItem.getTotal());
-        return dto;
-    }
+//    public CartItemDTO convertToCartItemDTO(CartItem cartItem) {
+//        CartItemDTO dto = new CartItemDTO();
+//        dto.setProductId(cartItem.getProduct().getId());
+//        dto.setProductName(cartItem.getProductName());
+//        dto.setQuantity(cartItem.getQuantity());
+//        dto.setPrice(cartItem.getPrice());
+//        dto.setColor(cartItem.getColor());
+//        dto.setTotal(cartItem.getTotal());
+//        return dto;
+//    }
 }

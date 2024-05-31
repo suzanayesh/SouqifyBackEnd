@@ -1,20 +1,10 @@
 package com.code.auth.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Table(name = "cart_items")
@@ -37,16 +27,72 @@ public class CartItem {
     @Column(nullable = false)
     private int quantity;
 
-    // Assume price is stored at the time of adding to cart to handle price changes over time
-    @Column(nullable = false)
-    private double price;
-    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "cart_item_colors", joinColumns = @JoinColumn(name = "cart_item_id"))
     @Column(name = "color")
-    private Color color;
+    private List<String> colors;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "cart_item_sizes", joinColumns = @JoinColumn(name = "cart_item_id"))
+    @Column(name = "size")
+    private List<String> sizes;
 
     @Transient  // This field is not stored in the database, it's calculated on the fly
     private double total;
 
-    @Column(name = "productName")
-    private String productName;
+    public Long getCartItemId() {
+        return cartItemId;
+    }
+
+    public void setCartItemId(Long cartItemId) {
+        this.cartItemId = cartItemId;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public List<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<String> colors) {
+        this.colors = colors;
+    }
+
+    public List<String> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(List<String> sizes) {
+        this.sizes = sizes;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
 }

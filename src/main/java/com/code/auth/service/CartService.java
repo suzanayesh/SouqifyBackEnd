@@ -66,12 +66,10 @@ public class CartService {
                 CartItem existingItem = cartItemRepository.findById(itemDetails.getCartItemId())
                         .orElseThrow(() -> new RuntimeException("CartItem not found with id " + itemDetails.getCartItemId()));
                 existingItem.setQuantity(itemDetails.getQuantity());
-                existingItem.setPrice(itemDetails.getPrice());
                 // Update other fields as necessary
-                existingItem.setColor(itemDetails.getColor());
-                existingItem.setTotal(itemDetails.getTotal());
-                existingItem.setProductName(itemDetails.getProductName());
-
+                existingItem.setColors(itemDetails.getColors());
+                existingItem.setTotal(itemDetails.getQuantity() * itemDetails.getProduct().getPrice());
+                existingItem.setSizes(itemDetails.getSizes());
                 updatedItems.add(cartItemRepository.save(existingItem));
             }
         }
