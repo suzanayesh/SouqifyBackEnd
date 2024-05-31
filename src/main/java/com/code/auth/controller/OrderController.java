@@ -1,15 +1,16 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.user.OrderDTO;
-import com.code.auth.entity.Order;
+import com.code.auth.dto.user.OrderResponseDTO;
+import com.code.auth.dto.user.OrderStatusUpdateDTO;
 import com.code.auth.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,65 +19,56 @@ import java.util.Map;
 @RequestMapping("/orders")
 public class OrderController {
 
-
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
-
-//    @GetMapping
-//    public ResponseEntity<List<Order>> getAllOrders() {
-//        List<Order> orders = orderService.findAllOrders();
-//        return ResponseEntity.ok(orders);
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
-//        return orderService.findOrderById(id)
-//                .map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/create")
-        @PreAuthorize("hasAuthority('RETAILER_PER')")
-    public ResponseEntity<Order> createOrder(@RequestBody OrderDTO orderDTO) {
-        Order createdOrder = orderService.createOrder(orderDTO);
-        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
+    @PostMapping("/create/{userId}")
+    public ResponseEntity<Map<String, Object>> createOrder(@PathVariable Long userId, @RequestBody OrderDTO orderDTO) {
+        // Set the userId from the path variable
+        orderDTO.setUserId(userId);
+
+        // Set the order date manually
+        orderDTO.setOrderDate(LocalDateTime.now());
+        OrderDTO createdOrder = orderService.createOrder(orderDTO);
+
+        // Calculate subtotal, tax, and total
+        double subtotal = createdOrder.getOrderItems().stream()
+                .mapToDouble(item -> item.getQuantity() * item.getPricePerUnit())
+                .sum();
+        double tax = subtotal * 0.1; // Assuming a 10% tax rate
+        double total = subtotal + tax;
+
+        // Create the response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderDateTime", createdOrder.getOrderDate());
+        response.put("orderStatus", createdOrder.getStatus());
+        response.put("orderId", createdOrder.getId());
+        response.put("userId", createdOrder.getUserId());
+        response.put("orderName", createdOrder.getOrderName());
+        response.put("subtotal", subtotal);
+        response.put("tax", tax);
+        response.put("total", total);
+
+        return ResponseEntity.ok(response);
     }
-
-//    @PostMapping("/{userId}")
-//    @PreAuthorize("hasAuthority('RETAILER_PER')")
-//    public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDTO, @PathVariable Long userId) {
-//        OrderDTO createdOrder = orderService.createOrder(orderDTO, userId);
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("message", "Your order received successfully");
-//        response.put("status", createdOrder.getStatus());
-//        response.put("orderDate", createdOrder.getOrderDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-//        response.put("total", createdOrder.getTotalPrice());
-//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    @GetMapping("/{orderId}")
+//    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
+//        OrderDTO orderDTO = orderService.getOrderById(orderId);
+//        return ResponseEntity.ok(orderDTO);
 //    }
-
-//
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
-//        try {
-//            Order updatedOrder = orderService.updateOrder(id, orderDTO);
-//            return ResponseEntity.ok(updatedOrder);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
-//        try {
-//            orderService.deleteOrder(id);
-//            return ResponseEntity.ok().build();
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+@GetMapping("/user/{userId}")
+public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser(@PathVariable Long userId) {
+    List<OrderResponseDTO> orders = orderService.getAllOrdersForUser(userId);
+    return ResponseEntity.ok(orders);
+}
+    @PutMapping("/update/{orderId}")
+    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateDTO statusUpdateDTO, @AuthenticationPrincipal UserDetails userDetails) {
+        OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, statusUpdateDTO.getOrderStatus(), userDetails);
+        return ResponseEntity.ok(updatedOrder);
+    }
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
+        OrderDTO orderDTO = orderService.getOrderById(orderId);
+        return ResponseEntity.ok(orderDTO);
+    }
 }
