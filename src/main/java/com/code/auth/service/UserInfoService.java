@@ -1,8 +1,6 @@
 package com.code.auth.service;
 
-import com.code.auth.dto.user.SimpleUserInfo;
-import com.code.auth.dto.user.SupplierResponseDto;
-import com.code.auth.dto.user.UserDto;
+import com.code.auth.dto.user.*;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.Role;
 import com.code.auth.entity.UserInfo;
@@ -25,6 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -240,6 +239,20 @@ public List<SupplierResponseDto> getAllSuppliers() {
     public Optional<Role> getRoleByName(String roleName) {
         return roleRepository.findByName(roleName);
     }
+    public List<UserProfileDTO> findRandomRetailers() {
+        List<UserInfo> retailers = userInfoRepository.findByRole_Id(3);
+        Collections.shuffle(retailers); // Shuffle to get random order
+        return retailers.stream()
+                .limit(4) // Limit to 4 retailers
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
-
+    private UserProfileDTO convertToDTO(UserInfo userInfo) {
+        UserProfileDTO dto = new UserProfileDTO();
+        dto.setUserId((long) userInfo.getId());
+        dto.setUserName(userInfo.getName());
+        dto.setProfileImage(userInfo.getUserProfile().getProfileImage());
+        return dto;
+    }
 }

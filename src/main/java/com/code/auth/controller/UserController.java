@@ -319,7 +319,10 @@ public class UserController {
     List<SupplierResponseDto> suppliers = userInfoService.getAllSuppliers();
     return ResponseEntity.ok(suppliers);
   }
-
-
+  @GetMapping("/random-retailers")
+  public ResponseEntity<List<UserProfileDTO>> getRandomRetailers() {
+    List<UserProfileDTO> retailers = userInfoService.findRandomRetailers();
+    return ResponseEntity.ok(retailers);
+  }
 
 }

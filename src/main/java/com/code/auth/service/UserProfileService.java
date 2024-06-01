@@ -1,6 +1,7 @@
 package com.code.auth.service;
 
 import com.code.auth.dto.user.UserProfileAddRateCommentDto;
+import com.code.auth.dto.user.UserProfileDTO;
 import com.code.auth.dto.user.UserProfileUpdateDto;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.entity.UserProfile;
@@ -14,7 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserProfileService {
@@ -23,6 +27,7 @@ public class UserProfileService {
     private UserProfileRepository userProfileRepository;
     @Autowired
     private UserInfoRepository userInfoRepository;
+
     @Transactional
     public UserProfile addRatingAndComment(UserProfileAddRateCommentDto dto) {
         UserProfile userProfile = userProfileRepository.findById(dto.getUserId())
@@ -32,6 +37,7 @@ public class UserProfileService {
         userProfile.setComment(dto.getComment());
         return userProfileRepository.save(userProfile);
     }
+
     @Transactional(readOnly = true)
     public UserProfile getUserProfileWithRatings() throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,6 +53,7 @@ public class UserProfileService {
         userProfile.getRatings().size(); // Access the ratings to ensure they are loaded if needed
         return userProfile;
     }
+
     @Transactional
     public UserProfile updateProfile(UserProfileUpdateDto updateDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,4 +92,6 @@ public class UserProfileService {
     public Optional<UserProfile> getUserProfile(Long userId) {
         return userProfileRepository.findById(userId);
     }
+
+
 }

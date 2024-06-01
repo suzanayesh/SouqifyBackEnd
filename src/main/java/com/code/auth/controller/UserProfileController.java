@@ -1,6 +1,7 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.user.UserProfileAddRateCommentDto;
+import com.code.auth.dto.user.UserProfileDTO;
 import com.code.auth.dto.user.UserProfileUpdateDto;
 import com.code.auth.entity.Rating;
 import com.code.auth.entity.UserInfo;
@@ -108,6 +109,5 @@ import java.util.stream.Collectors;
             return data;
         }
     }
-
 
 }
