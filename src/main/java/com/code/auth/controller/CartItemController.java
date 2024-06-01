@@ -79,6 +79,7 @@ package com.code.auth.controller;
 
 import java.util.List;
 
+import com.code.auth.dto.user.AllCartItemsDTO;
 import com.code.auth.dto.user.CartItemDTO;
 import com.code.auth.entity.CartItem;
 import com.code.auth.service.CartItemService;
@@ -105,8 +106,9 @@ public class CartItemController {
     }
 
     @GetMapping
-    public List<CartItem> getAllCartItems() {
-        return cartItemService.findAllCartItems();
+    public ResponseEntity<?> getAllCartItems() {
+        List<AllCartItemsDTO> result = cartItemService.findAllCartItems();
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

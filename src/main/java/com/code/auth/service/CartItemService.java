@@ -108,8 +108,11 @@ package com.code.auth.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.code.auth.dto.user.AllCartItemsDTO;
 import com.code.auth.dto.user.CartItemDTO;
+import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Cart;
 import com.code.auth.entity.CartItem;
 import com.code.auth.entity.Color;
@@ -136,8 +139,11 @@ public class CartItemService {
         this.userInfoService = userInfoService;
     }
 
-    public List<CartItem> findAllCartItems() {
-        return cartItemRepository.findAll();
+    public List<AllCartItemsDTO> findAllCartItems() {
+        List<CartItem> items = cartItemRepository.findAll();
+        return items.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public Optional<CartItem> findCartItemById(Long id) {
@@ -199,13 +205,24 @@ public class CartItemService {
         cartItem.setProduct(product);
         cartItem.setQuantity(cartItemDTO.getQuantity());
         cartItem.setTotal((cartItemDTO.getQuantity() * product.getPrice()));
-        cartItem.setColors(cartItemDTO.getColors());
-        cartItem.setSizes(cartItemDTO.getSizes());
+        cartItem.setColors(cartItemDTO.getSelectedColors());
+        cartItem.setSizes(cartItemDTO.getSelectedSizes());
 
         cartItemRepository.save(cartItem);
         return cartItem;
     }
 
+    private AllCartItemsDTO convertToDTO(CartItem cartItem) {
+        AllCartItemsDTO dto = new AllCartItemsDTO();
+        dto.setCartItemId(cartItem.getCartItemId());
+        dto.setModelNumber(cartItem.getProduct().getModelNumber());
+        dto.setProductId(cartItem.getProduct().getId());
+        dto.setColors(cartItem.getColors());
+        dto.setSizes(cartItem.getSizes());
+        dto.setTotal(cartItem.getQuantity() * cartItem.getProduct().getPrice());
+        dto.setQuantity(cartItem.getQuantity());
+        return dto;
+    }
 
 
 

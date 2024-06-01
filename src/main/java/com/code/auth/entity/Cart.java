@@ -60,4 +60,15 @@ public class Cart {
         cartItems.remove(cartItem);
         cartItem.setCart(null);
     }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "cartId=" + cartId +
+                ", user=" + user +
+                ", createdDate=" + createdDate +
+                ", cartItems=" + cartItems +
+                ", lastUpdated=" + lastUpdated +
+                '}';
+    }
 }

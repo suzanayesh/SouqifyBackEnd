@@ -38,7 +38,6 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    @JsonBackReference
     @JsonIgnore
     private Category category;
 
@@ -97,5 +96,24 @@ public class Product {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error in JSON reading", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", modelNumber=" + modelNumber +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                ", category=" + category +
+                ", user=" + user +
+                ", stockQuantity=" + stockQuantity +
+                ", brand='" + brand + '\'' +
+                ", availableSizes=" + availableSizes +
+                ", availableColors=" + availableColors +
+                ", sizesJson='" + sizesJson + '\'' +
+                ", colorsJson='" + colorsJson + '\'' +
+                '}';
     }
 }

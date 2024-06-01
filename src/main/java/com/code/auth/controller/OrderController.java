@@ -70,10 +70,10 @@ public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser(@PathVariable 
         OrderDTO orderDTO = orderService.getOrderById(orderId);
         return ResponseEntity.ok(orderDTO);
     }
-    @GetMapping("/dashboard/{userId}")
+    @GetMapping("/dashboard")
     @PreAuthorize("hasAuthority('SUPPLIER_PER')")
-    public ResponseEntity<List<OrderResponseDTO>> getLastThreeOrders(@PathVariable Long userId) {
-        List<OrderResponseDTO> orders = orderService.getLastThreeOrdersForUser(userId);
+    public ResponseEntity<List<OrderResponseDTO>> getLastThreeOrders() {
+        List<OrderResponseDTO> orders = orderService.getLastThreeOrdersForUser();
         return ResponseEntity.ok(orders);
     }
 }

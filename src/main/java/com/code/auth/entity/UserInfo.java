@@ -1,5 +1,6 @@
 package com.code.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 @Data
@@ -9,7 +10,7 @@ public class UserInfo {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+  private Long id;
   private String name;
   private String email;
   private String password;
@@ -17,6 +18,7 @@ public class UserInfo {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role_id")
+  @JsonIgnore
   private Role role;
 
 

@@ -21,6 +21,9 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     @Autowired
+    private UserInfoService userInfoService;
+
+    @Autowired
     private OrderItemRepository orderItemRepository;
     public OrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
@@ -64,7 +67,8 @@ public class OrderService {
         return orderDTO;
     }
 
-    public List<OrderResponseDTO> getLastThreeOrdersForUser(Long userId) {
+    public List<OrderResponseDTO> getLastThreeOrdersForUser() {
+        Long userId =  userInfoService.getCurrentUserInfo().getId();
         List<Order> orders = orderRepository.findTop3ByUserIdOrderByOrderDateDesc(userId);
         return orders.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }

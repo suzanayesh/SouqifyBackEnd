@@ -327,11 +327,11 @@ public class UserController {
 //    List<UserProfileDTO> retailers = userInfoService.findRandomRetailers();
 //    return ResponseEntity.ok(retailers);
 //  }
-  @GetMapping("/supplierDashboard/{userId}")
+  @GetMapping("/supplierDashboard")
   @PreAuthorize("hasAuthority('SUPPLIER_PER')")
-  public ResponseEntity<SupplierDashboardResponseDTO> getSupplierDashboard(@PathVariable Long userId) {
+  public ResponseEntity<SupplierDashboardResponseDTO> getSupplierDashboard() {
     // Get last three orders
-    List<OrderResponseDTO> lastThreeOrders = orderService.getLastThreeOrdersForUser(userId);
+    List<OrderResponseDTO> lastThreeOrders = orderService.getLastThreeOrdersForUser();
 
     // Get random retailers
     List<UserProfileDTO> randomRetailers = userInfoService.findRandomRetailers();

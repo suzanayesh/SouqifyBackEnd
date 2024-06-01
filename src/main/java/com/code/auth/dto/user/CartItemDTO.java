@@ -16,8 +16,8 @@ import java.util.List;
 public class CartItemDTO {
     private Long productId;
     private int quantity;
-    private List<String> colors;
-    private List<String> sizes;
+    private List<String> selectedColors;
+    private List<String> selectedSizes;
 
     public Long getProductId() {
         return productId;
@@ -35,19 +35,19 @@ public class CartItemDTO {
         this.quantity = quantity;
     }
 
-    public List<String> getColors() {
-        return colors;
+    public List<String> getSelectedColors() {
+        return selectedColors;
     }
 
-    public void setColors(List<String> colors) {
-        this.colors = colors;
+    public void setSelectedColors(List<String> selectedColors) {
+        this.selectedColors = selectedColors;
     }
 
-    public List<String> getSizes() {
-        return sizes;
+    public List<String> getSelectedSizes() {
+        return selectedSizes;
     }
 
-    public void setSizes(List<String> sizes) {
-        this.sizes = sizes;
+    public void setSelectedSizes(List<String> selectedSizes) {
+        this.selectedSizes = selectedSizes;
     }
 }

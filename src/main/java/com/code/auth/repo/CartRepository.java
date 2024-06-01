@@ -15,6 +15,6 @@ import java.util.List;
 public interface CartRepository extends JpaRepository<Cart, Long> {
     // Custom queries can be added here if needed
     @Query("SELECT c FROM Cart c WHERE c.user.id = :userId")
-    Cart findByUserId(@Param("userId") int userId);
+    Cart findByUserId(@Param("userId") Long userId);
 }
 
