@@ -12,6 +12,7 @@ import com.code.auth.lookup.Response;
 import com.code.auth.repo.UserInfoRepository;
 import com.code.auth.repo.UserProfileRepository;
 import com.code.auth.service.JwtService;
+import com.code.auth.service.OrderService;
 import com.code.auth.service.RefreshTokenService;
 import com.code.auth.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class UserController {
   private UserInfoService service;
   @Autowired
   private UserProfileRepository userProfileRepository;
+  @Autowired
+  private OrderService orderService;
   @Autowired
   private JwtService jwtService;
   private final UserInfoService userService;
@@ -319,10 +322,27 @@ public class UserController {
     List<SupplierResponseDto> suppliers = userInfoService.getAllSuppliers();
     return ResponseEntity.ok(suppliers);
   }
-  @GetMapping("/random-retailers")
-  public ResponseEntity<List<UserProfileDTO>> getRandomRetailers() {
-    List<UserProfileDTO> retailers = userInfoService.findRandomRetailers();
-    return ResponseEntity.ok(retailers);
+//  @GetMapping("/random-retailers")
+//  public ResponseEntity<List<UserProfileDTO>> getRandomRetailers() {
+//    List<UserProfileDTO> retailers = userInfoService.findRandomRetailers();
+//    return ResponseEntity.ok(retailers);
+//  }
+  @GetMapping("/supplierDashboard/{userId}")
+  @PreAuthorize("hasAuthority('SUPPLIER_PER')")
+  public ResponseEntity<SupplierDashboardResponseDTO> getSupplierDashboard(@PathVariable Long userId) {
+    // Get last three orders
+    List<OrderResponseDTO> lastThreeOrders = orderService.getLastThreeOrdersForUser(userId);
+
+    // Get random retailers
+    List<UserProfileDTO> randomRetailers = userInfoService.findRandomRetailers();
+
+    // Create the response DTO
+    SupplierDashboardResponseDTO response = new SupplierDashboardResponseDTO();
+    response.setLastThreeOrders(lastThreeOrders);
+    response.setRandomRetailers(randomRetailers);
+
+    return ResponseEntity.ok(response);
   }
+
 
 }
