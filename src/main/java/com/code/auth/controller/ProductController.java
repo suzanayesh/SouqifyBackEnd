@@ -59,8 +59,8 @@ public class ProductController {
     }
 
     @GetMapping(value = "get-all-by-category/{categoryId}")
-    public ResponseEntity<?> getAllByCategory(@PathVariable Long categoryId){
-        List<Product> result = productService.findAllByCategoryId(categoryId);
+    public ResponseEntity<?> getAllByCategory(@PathVariable Long categoryId) {
+        List<ProductDto> result = productService.findAllByCategoryId(categoryId);
         return ResponseEntity.ok(result);
     }
 

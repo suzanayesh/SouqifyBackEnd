@@ -19,4 +19,5 @@ public class ProductDto {
     private int stockQuantity;
     private List<String> availableSizes;
     private List<String> availableColors;
+    private String userName;
 }

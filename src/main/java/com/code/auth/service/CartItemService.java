@@ -182,7 +182,11 @@ public class CartItemService {
 
     public CartItem addCartItemToCart(CartItemDTO cartItemDTO) {
         Cart cart = cartRepository.findByUserId(userInfoService.getCurrentUserInfo().getId());
-
+        if(cart == null){
+            cart = new Cart();
+            cart.setUser(userInfoService.getCurrentUserInfo());
+            cartRepository.save(cart);
+        }
         Optional<Product> optionalProduct = productRepository.findById(cartItemDTO.getProductId());
         if (!optionalProduct.isPresent()) {
             throw new RuntimeException("Product not found with id: " + cartItemDTO.getProductId());

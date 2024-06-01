@@ -51,14 +51,16 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public List<Product> findAllByCategoryId(Long id){
-        return productRepository.findAllByCategoryId(id);
-    }
-
     public List<Product> findAllProductsByUser(Long userId) {
         return productRepository.findAllByUserId(userId);
     }
 
+    public List<ProductDto> findAllByCategoryId(Long categoryId) {
+        List<Product> products = productRepository.findAllByCategoryId(categoryId);
+        return products.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
     public Optional<Product> findProductByIdAndUser(Long userId, Long productId) {
         return productRepository.findByIdAndUserId(productId, userId);
     }
@@ -81,6 +83,20 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    private ProductDto convertToDTO(Product product) {
+        ProductDto dto = new ProductDto();
+        dto.setId(product.getId());
+        dto.setProductName(product.getProductName());
+        dto.setModelNumber(product.getModelNumber());
+        dto.setPrice(product.getPrice());
+        dto.setDescription(product.getDescription());
+        dto.setStockQuantity(product.getStockQuantity());
+        dto.setBrand(product.getBrand());
+        dto.setAvailableSizes(product.getAvailableSizes());
+        dto.setAvailableColors(product.getAvailableColors());
+        dto.setUserName(product.getUser().getName());  // Assuming `UserInfo` has a `getName` method
+        return dto;
+    }
     @Transactional
     public void deleteProductByUserAndId(Long userId, Long productId) {
         Optional<Product> product = findProductByIdAndUser(userId, productId);
@@ -100,7 +116,8 @@ public class ProductService {
                         product.getCategory().getCategoryId(),
                         product.getStockQuantity(),
                         product.getAvailableSizes(),
-                        product.getAvailableColors()))
+                        product.getAvailableColors(),
+                        product.getProductName()))
                 .collect(Collectors.toList());
     }
 }
