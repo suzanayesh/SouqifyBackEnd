@@ -9,12 +9,11 @@ import com.code.auth.exception.OrderNotFoundException;
 import com.code.auth.repo.OrderItemRepository;
 import com.code.auth.repo.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class OrderService {
 
@@ -23,7 +22,6 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
-
     public OrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
         order = orderRepository.save(order);
@@ -66,13 +64,22 @@ public class OrderService {
         return orderDTO;
     }
 
+    public List<OrderResponseDTO> getLastThreeOrdersForUser(Long userId) {
+        List<Order> orders = orderRepository.findTop3ByUserIdOrderByOrderDateDesc(userId);
+        return orders.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    }
+
     private OrderResponseDTO convertToResponseDTO(Order order) {
         OrderResponseDTO dto = new OrderResponseDTO();
+        dto.setOrderId(order.getId());
         dto.setOrderStatus(order.getStatus());
         dto.setOrderDate(order.getOrderDate().toString());
         dto.setOrderName(order.getOrderName());
         return dto;
     }
+
+
+
 
     private Order convertToEntity(OrderDTO orderDTO) {
         Order order = new Order();

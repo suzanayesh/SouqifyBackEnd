@@ -1,11 +1,10 @@
 package com.code.auth.controller;
 
-import com.code.auth.dto.user.OrderDTO;
-import com.code.auth.dto.user.OrderResponseDTO;
-import com.code.auth.dto.user.OrderStatusUpdateDTO;
+import com.code.auth.dto.user.*;
 import com.code.auth.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -70,5 +69,11 @@ public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser(@PathVariable 
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
         OrderDTO orderDTO = orderService.getOrderById(orderId);
         return ResponseEntity.ok(orderDTO);
+    }
+    @GetMapping("/dashboard/{userId}")
+    @PreAuthorize("hasAuthority('SUPPLIER_PER')")
+    public ResponseEntity<List<OrderResponseDTO>> getLastThreeOrders(@PathVariable Long userId) {
+        List<OrderResponseDTO> orders = orderService.getLastThreeOrdersForUser(userId);
+        return ResponseEntity.ok(orders);
     }
 }
