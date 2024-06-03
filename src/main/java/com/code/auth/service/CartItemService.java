@@ -120,8 +120,13 @@ import com.code.auth.entity.Product;
 import com.code.auth.repo.CartItemRepository;
 import com.code.auth.repo.CartRepository;
 import com.code.auth.repo.ProductRepository;
+import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.xml.stream.events.EndDocument;
 
 @Service
 public class CartItemService {
@@ -132,11 +137,14 @@ public class CartItemService {
 
     private final UserInfoService userInfoService;
 
-    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository, ProductRepository productRepository, UserInfoService userInfoService) {
+    private final EntityManager entityManager;
+
+    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository, ProductRepository productRepository, UserInfoService userInfoService, EntityManager entityManager) {
         this.cartItemRepository = cartItemRepository;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.userInfoService = userInfoService;
+        this.entityManager = entityManager;
     }
 
     public List<AllCartItemsDTO> findAllCartItems() {
@@ -174,10 +182,22 @@ public class CartItemService {
         cartItem.setSizes(sizes);
         return cartItemRepository.save(cartItem);
     }
+    @Transactional
     public void deleteCartItem(Long id) {
-        CartItem cartItem = cartItemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + id));
-        cartItemRepository.delete(cartItem);
+        Logger logger = LoggerFactory.getLogger(getClass());
+
+        logger.info("Attempting to delete cart item with id: {}", id);
+
+        CartItem cartItem = entityManager.find(CartItem.class, id);
+
+        try {
+            entityManager.remove(cartItem);
+            entityManager.flush();  // Force the persistence context to be synchronized with the database
+            logger.info("Cart item with id: {} has been successfully deleted", id);
+        } catch (Exception e) {
+            logger.error("Error occurred while deleting cart item with id: {}", id, e);
+            throw e;
+        }
     }
 //    public void deleteCartItem(Long id) {
 //        cartItemRepository.deleteById(id);

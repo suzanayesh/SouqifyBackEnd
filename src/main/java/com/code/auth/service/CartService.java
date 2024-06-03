@@ -23,10 +23,12 @@ public class CartService {
     private final CartItemRepository cartItemRepository; // Assume this exists
     private final ProductRepository productRepository;
 
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,ProductRepository  productRepository ) {
+    private final UserInfoService userInfoService;
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductRepository  productRepository, UserInfoService userInfoService) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.productRepository=productRepository;
+        this.userInfoService = userInfoService;
     }
     public List<Cart> findAllCarts() {
         return cartRepository.findAll();
@@ -40,6 +42,10 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
         return cart.getCartItems();
+    }
+
+    public Cart getCartByUserId(Long id){
+        return cartRepository.findByUserId(id);
     }
     public Cart saveCart(Cart cart) {
         return cartRepository.save(cart);
@@ -84,7 +90,12 @@ public class CartService {
         return cartRepository.save(cart);
     }
     public void deleteCart(Long id) {
-        cartRepository.deleteById(id);
+        Cart cart = cartRepository.findByUserId(userInfoService.getCurrentUserInfo().getId());
+        if(cart == null){
+            cart = new Cart();
+            cart.setUser(userInfoService.getCurrentUserInfo());
+            cartRepository.save(cart);
+        }
     }
     public CartItem addCartItemToCart(Long cartId, CartItem cartItem, Long productId) {
         // Find the Cart by ID

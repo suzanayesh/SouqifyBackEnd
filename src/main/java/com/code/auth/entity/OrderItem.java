@@ -1,9 +1,12 @@
 package com.code.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "order_items")
@@ -26,5 +29,16 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "order_item_colors", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "color")
+    private List<String> colors;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "order_item_sizes", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "size")
+    private List<String> sizes;
 }

@@ -3,6 +3,8 @@ package com.code.auth.service;
 import com.code.auth.dto.user.OrderDTO;
 import com.code.auth.dto.user.OrderItemDTO;
 import com.code.auth.dto.user.OrderResponseDTO;
+import com.code.auth.entity.Cart;
+import com.code.auth.entity.CartItem;
 import com.code.auth.entity.Order;
 import com.code.auth.entity.OrderItem;
 import com.code.auth.exception.OrderNotFoundException;
@@ -11,9 +13,13 @@ import com.code.auth.repo.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class OrderService {
 
@@ -24,13 +30,22 @@ public class OrderService {
     private UserInfoService userInfoService;
 
     @Autowired
+    private CartItemService cartItemService;
+
+    @Autowired
     private OrderItemRepository orderItemRepository;
-    public OrderDTO createOrder(OrderDTO orderDTO) {
-        Order order = convertToEntity(orderDTO);
+
+    @Autowired
+    private CartService cartService;
+
+    @Transactional
+    public Order createOrder() {
+        Order order = convertCartItemsToOrder();
         order = orderRepository.save(order);
-        return convertToDTO(order);
+        return order;
     }
 
+    @Transactional
     public OrderDTO updateOrderStatus(Long orderId, String orderStatus, UserDetails userDetails) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
@@ -39,14 +54,24 @@ public class OrderService {
         return convertToDTO(order);
     }
 
+    @Transactional
     public OrderDTO getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
         return convertToDTO(order);
     }
 
-    public List<OrderResponseDTO> getAllOrdersForUser(Long userId) {
+    @Transactional
+    public List<OrderResponseDTO> getAllOrdersForUser() {
+        Long userId = userInfoService.getCurrentUserInfo().getId();
         List<Order> orders = orderRepository.findByUserId(userId);
+        return orders.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getLastThreeOrdersForUser() {
+        Long userId = userInfoService.getCurrentUserInfo().getId();
+        List<Order> orders = orderRepository.findTop3ByUserIdOrderByOrderDateDesc(userId);
         return orders.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }
 
@@ -62,15 +87,11 @@ public class OrderService {
             orderItemDTO.setProductId(orderItem.getProductId());
             orderItemDTO.setQuantity(orderItem.getQuantity());
             orderItemDTO.setPricePerUnit(orderItem.getPricePerUnit());
+            orderItemDTO.setColors(new ArrayList<>(orderItem.getColors()));
+            orderItemDTO.setSizes(new ArrayList<>(orderItem.getSizes()));
             return orderItemDTO;
         }).collect(Collectors.toList()));
         return orderDTO;
-    }
-
-    public List<OrderResponseDTO> getLastThreeOrdersForUser() {
-        Long userId =  userInfoService.getCurrentUserInfo().getId();
-        List<Order> orders = orderRepository.findTop3ByUserIdOrderByOrderDateDesc(userId);
-        return orders.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }
 
     private OrderResponseDTO convertToResponseDTO(Order order) {
@@ -81,9 +102,6 @@ public class OrderService {
         dto.setOrderName(order.getOrderName());
         return dto;
     }
-
-
-
 
     private Order convertToEntity(OrderDTO orderDTO) {
         Order order = new Order();
@@ -101,4 +119,37 @@ public class OrderService {
         }).collect(Collectors.toList()));
         return order;
     }
+
+    @Transactional
+    public Order convertCartItemsToOrder() {
+        Long userId = userInfoService.getCurrentUserInfo().getId();
+        Cart cart = cartService.getCartByUserId(userId);
+        Order order = new Order();
+        order.setOrderDate(LocalDateTime.now());
+        order.setOrderName("Order");
+        order.setUserId(userId);
+        order.setStatus("Pending");
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (CartItem cartItem : cart.getCartItems()) {
+            orderItems.add(convertCartItemToOrderItem(cartItem, order));
+        }
+        order.setOrderItems(orderItems);
+        return order;
+    }
+
+    @Transactional
+    public OrderItem convertCartItemToOrderItem(CartItem cartItem, Order order) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setProductId(cartItem.getProduct().getId());
+        orderItem.setPricePerUnit(cartItem.getProduct().getPrice());
+        orderItem.setColors(new ArrayList<>(cartItem.getColors()));
+        orderItem.setSizes(new ArrayList<>(cartItem.getSizes()));
+        cartService.deleteCart(2L);
+        cartItemService.deleteCartItem(cartItem.getCartItemId());
+        return orderItem;
+    }
+
+
 }

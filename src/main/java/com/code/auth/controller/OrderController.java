@@ -1,7 +1,9 @@
 package com.code.auth.controller;
 
 import com.code.auth.dto.user.*;
+import com.code.auth.entity.Order;
 import com.code.auth.service.OrderService;
+import com.code.auth.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,43 +23,22 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/create/{userId}")
-    public ResponseEntity<Map<String, Object>> createOrder(@PathVariable Long userId, @RequestBody OrderDTO orderDTO) {
-        // Set the userId from the path variable
-        orderDTO.setUserId(userId);
+    @Autowired
+    private UserInfoService userInfoService;
 
-        // Set the order date manually
-        orderDTO.setOrderDate(LocalDateTime.now());
-        OrderDTO createdOrder = orderService.createOrder(orderDTO);
-
-        // Calculate subtotal, tax, and total
-        double subtotal = createdOrder.getOrderItems().stream()
-                .mapToDouble(item -> item.getQuantity() * item.getPricePerUnit())
-                .sum();
-        double tax = subtotal * 0.1; // Assuming a 10% tax rate
-        double total = subtotal + tax;
-
-        // Create the response map
-        Map<String, Object> response = new HashMap<>();
-        response.put("orderDateTime", createdOrder.getOrderDate());
-        response.put("orderStatus", createdOrder.getStatus());
-        response.put("orderId", createdOrder.getId());
-        response.put("userId", createdOrder.getUserId());
-        response.put("orderName", createdOrder.getOrderName());
-        response.put("subtotal", subtotal);
-        response.put("tax", tax);
-        response.put("total", total);
-
-        return ResponseEntity.ok(response);
+    @DeleteMapping("/create")
+    public ResponseEntity<?> createOrder() {
+        Order result = orderService.createOrder();
+        return ResponseEntity.ok(result);
     }
 //    @GetMapping("/{orderId}")
 //    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
 //        OrderDTO orderDTO = orderService.getOrderById(orderId);
 //        return ResponseEntity.ok(orderDTO);
 //    }
-@GetMapping("/user/{userId}")
-public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser(@PathVariable Long userId) {
-    List<OrderResponseDTO> orders = orderService.getAllOrdersForUser(userId);
+@GetMapping("/user")
+public ResponseEntity<List<OrderResponseDTO>> getAllOrdersForUser() {
+    List<OrderResponseDTO> orders = orderService.getAllOrdersForUser();
     return ResponseEntity.ok(orders);
 }
     @PutMapping("/update/{orderId}")
