@@ -4,10 +4,12 @@ import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.Configuration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 @org.springframework.context.annotation.Configuration
 public class SocketIOConfig {
     @Bean
+    @Primary
     public SocketIOServer socketIOServer() {
         Configuration config = new Configuration();
         config.setHostname("0.0.0.0");
