@@ -81,7 +81,6 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(Arrays.asList("*", "http://localhost:8100")); // Allow all origins
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
-    configuration.setAllowCredentials(true);
     configuration.addExposedHeader("Sec-Websocket-Extensions");
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
