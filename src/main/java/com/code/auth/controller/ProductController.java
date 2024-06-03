@@ -6,8 +6,10 @@ import java.util.Map;
 
 import com.code.auth.config.UserInfoDetails;
 import com.code.auth.dto.user.ProductDto;
+import com.code.auth.dto.user.ProductPicDTO;
 import com.code.auth.entity.Product;
 import com.code.auth.entity.UserInfo;
+import com.code.auth.service.ProductPicService;
 import com.code.auth.service.ProductService;
 import com.code.auth.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class ProductController {
     @Autowired
     private UserInfoService userService;
 
+    @Autowired
+    private ProductPicService productPicService;
+
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
@@ -35,6 +40,12 @@ public class ProductController {
     public List<Product> getAllProductsByUser(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = getUserIdFromUserDetails(userDetails);
         return productService.findAllProductsByUser(userId);
+    }
+
+    @PostMapping("product-pic")
+    public ResponseEntity<?> addProductPic(@RequestBody ProductPicDTO dto){
+        boolean success = productPicService.addProductOic(dto.getProductId(), dto.getUrl());
+        return new ResponseEntity<>(success, HttpStatus.CREATED);
     }
 
     @PostMapping("supplier/addProduct")

@@ -20,4 +20,5 @@ public class ProductDto {
     private List<String> availableSizes;
     private List<String> availableColors;
     private String userName;
+    private String url;
 }

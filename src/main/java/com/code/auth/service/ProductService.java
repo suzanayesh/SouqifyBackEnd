@@ -8,8 +8,10 @@ import java.util.stream.Collectors;
 import com.code.auth.dto.user.ProductDto;
 import com.code.auth.entity.Category;
 import com.code.auth.entity.Product;
+import com.code.auth.entity.ProductPic;
 import com.code.auth.entity.UserInfo;
 import com.code.auth.repo.CategoryRepository;
+import com.code.auth.repo.ProductPicRepositpry;
 import com.code.auth.repo.ProductRepository;
 import com.code.auth.repo.UserInfoRepository;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,13 @@ public class ProductService {
     private final UserInfoRepository userInfoRepository;
     private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository, UserInfoRepository userInfoRepository, CategoryRepository categoryRepository) {
+    private final ProductPicRepositpry productPicRepositpry;
+
+    public ProductService(ProductRepository productRepository, UserInfoRepository userInfoRepository, CategoryRepository categoryRepository, ProductPicRepositpry productPicRepositpry) {
         this.productRepository = productRepository;
         this.userInfoRepository = userInfoRepository;
         this.categoryRepository = categoryRepository;
+        this.productPicRepositpry = productPicRepositpry;
     }
 
     @Transactional
@@ -95,6 +100,12 @@ public class ProductService {
         dto.setAvailableSizes(product.getAvailableSizes());
         dto.setAvailableColors(product.getAvailableColors());
         dto.setUserName(product.getUser().getName());  // Assuming `UserInfo` has a `getName` method
+        if(productPicRepositpry.findByProductId(product.getId()).isPresent()){
+            ProductPic productPic = productPicRepositpry.findByProductId(product.getId()).get();
+            dto.setUrl(productPic.getUrl());
+        }else{
+            dto.setUrl("../../../assets/random/1.webp");
+        }
         return dto;
     }
     @Transactional
@@ -117,7 +128,9 @@ public class ProductService {
                         product.getStockQuantity(),
                         product.getAvailableSizes(),
                         product.getAvailableColors(),
-                        product.getProductName()))
+                        product.getProductName(),
+                        productPicRepositpry.findByProductId(product.getId()).get().getUrl()
+                ))
                 .collect(Collectors.toList());
     }
 }
