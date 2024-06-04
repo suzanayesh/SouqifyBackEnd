@@ -15,11 +15,13 @@ public class AllCartItemsDTO {
 
     private Long modelNumber;
 
+    private String url;
+
 
     public AllCartItemsDTO() {
     }
 
-    public AllCartItemsDTO(Long cartItemId, Long productId, int quantity, List<String> colors, List<String> sizes, double total, Long modelNumber) {
+    public AllCartItemsDTO(Long cartItemId, Long productId, int quantity, List<String> colors, List<String> sizes, double total, Long modelNumber, String url) {
         this.cartItemId = cartItemId;
         this.productId = productId;
         this.quantity = quantity;
@@ -27,6 +29,7 @@ public class AllCartItemsDTO {
         this.sizes = sizes;
         this.total = total;
         this.modelNumber = modelNumber;
+        this.url = url;
     }
 
     public Long getProductId() {
@@ -83,5 +86,13 @@ public class AllCartItemsDTO {
 
     public void setCartItemId(Long cartItemId) {
         this.cartItemId = cartItemId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

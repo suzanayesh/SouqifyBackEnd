@@ -113,12 +113,10 @@ import java.util.stream.Collectors;
 import com.code.auth.dto.user.AllCartItemsDTO;
 import com.code.auth.dto.user.CartItemDTO;
 import com.code.auth.dto.user.ProductDto;
-import com.code.auth.entity.Cart;
-import com.code.auth.entity.CartItem;
-import com.code.auth.entity.Color;
-import com.code.auth.entity.Product;
+import com.code.auth.entity.*;
 import com.code.auth.repo.CartItemRepository;
 import com.code.auth.repo.CartRepository;
+import com.code.auth.repo.ProductPicRepositpry;
 import com.code.auth.repo.ProductRepository;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
@@ -139,12 +137,21 @@ public class CartItemService {
 
     private final EntityManager entityManager;
 
-    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository, ProductRepository productRepository, UserInfoService userInfoService, EntityManager entityManager) {
+    private final ProductService productService;
+
+    private final ProductPicService productPicService;
+
+    private final ProductPicRepositpry productPicRepositpry;
+
+    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository, ProductRepository productRepository, UserInfoService userInfoService, EntityManager entityManager, ProductService productService, ProductPicService productPicService, ProductPicRepositpry productPicRepositpry) {
         this.cartItemRepository = cartItemRepository;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.userInfoService = userInfoService;
         this.entityManager = entityManager;
+        this.productService = productService;
+        this.productPicService = productPicService;
+        this.productPicRepositpry = productPicRepositpry;
     }
 
     public List<AllCartItemsDTO> findAllCartItems() {
@@ -234,6 +241,10 @@ public class CartItemService {
 
     private AllCartItemsDTO convertToDTO(CartItem cartItem) {
         AllCartItemsDTO dto = new AllCartItemsDTO();
+        if(productPicRepositpry.findByProductId(cartItem.getProduct().getId()).isPresent()){
+            dto.setUrl(productPicRepositpry.findByProductId(cartItem.getProduct().getId()).get().getUrl());
+        }
+
         dto.setCartItemId(cartItem.getCartItemId());
         dto.setModelNumber(cartItem.getProduct().getModelNumber());
         dto.setProductId(cartItem.getProduct().getId());
