@@ -1,5 +1,6 @@
 package com.code.auth.controller;
 
+import com.code.auth.dto.PartnerDTO;
 import com.code.auth.entity.Message;
 import com.code.auth.service.MessageService;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -27,7 +28,7 @@ public class MessageController {
     }
 
     @GetMapping("/chats")
-    public List<String> getAllChats(@RequestParam String username) {
+    public List<PartnerDTO> getAllChats(@RequestParam String username) {
         return messageService.getAllChatPartners(username);
     }
     @PostMapping("/initiate")
